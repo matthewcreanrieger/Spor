@@ -7,13 +7,53 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1ACABEFE2780AFF8FA3B1E06 /* Pods_SporUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73121B5DA9C6DF2EB5209E17 /* Pods_SporUITests.framework */; };
+		2B9FC48961B8DE51B5079695 /* Pods_SporTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F6AF64457237D18FD0230C1 /* Pods_SporTests.framework */; };
+		2F784EE98DFB6CE0C2060534 /* Pods_Spor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 562D18AEE4C7CACF34AEB4B0 /* Pods_Spor.framework */; };
+		3F03261F2257E67600E6903A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3F03261D2257E67600E6903A /* Main.storyboard */; };
+		3F0DA8E3227795E3003E56E7 /* VCSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F0DA8E2227795E3003E56E7 /* VCSummary.swift */; };
+		3F0DA8E82277A3F2003E56E7 /* VCBreakdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F0DA8E72277A3F2003E56E7 /* VCBreakdown.swift */; };
+		3F0DA8EA2277AD5B003E56E7 /* VCPieCharts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F0DA8E92277AD5B003E56E7 /* VCPieCharts.swift */; };
+		3F0DA8EC2277B0F3003E56E7 /* VCLineCharts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F0DA8EB2277B0F3003E56E7 /* VCLineCharts.swift */; };
+		3F45D0DA22555EF000E2AB7D /* VCLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F45D0D922555EF000E2AB7D /* VCLogin.swift */; };
+		3F5024F82227289500EF40BA /* Spor.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3F5024F62227289500EF40BA /* Spor.xcdatamodeld */; };
+		3F50253F222825D100EF40BA /* Designables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F50253E222825D100EF40BA /* Designables.swift */; };
+		3F56377C2233224200F80125 /* CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F5637782233224200F80125 /* CoreData.swift */; };
+		3F60A92B22790D7D003D6D6B /* VCNewTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F60A92A22790D7D003D6D6B /* VCNewTransaction.swift */; };
+		3F60A92F227914C1003D6D6B /* VCEditTransactions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F60A92E227914C1003D6D6B /* VCEditTransactions.swift */; };
+		3F60A93122791A04003D6D6B /* VCSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F60A93022791A04003D6D6B /* VCSettings.swift */; };
+		3F60A934227948DA003D6D6B /* Variables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F60A933227948DA003D6D6B /* Variables.swift */; };
 		3F6C9F972224BE8F0080336C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6C9F962224BE8F0080336C /* AppDelegate.swift */; };
-		3F6C9F992224BE8F0080336C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6C9F982224BE8F0080336C /* ViewController.swift */; };
-		3F6C9F9C2224BE8F0080336C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3F6C9F9A2224BE8F0080336C /* Main.storyboard */; };
 		3F6C9F9E2224BE920080336C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F6C9F9D2224BE920080336C /* Assets.xcassets */; };
 		3F6C9FA12224BE920080336C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3F6C9F9F2224BE920080336C /* LaunchScreen.storyboard */; };
 		3F6C9FAC2224BE920080336C /* SporTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6C9FAB2224BE920080336C /* SporTests.swift */; };
 		3F6C9FB72224BE920080336C /* SporUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F6C9FB62224BE920080336C /* SporUITests.swift */; };
+		3F74EF6F223F275B0029BEE7 /* Segues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F74EF6E223F275B0029BEE7 /* Segues.swift */; };
+		3F74EF7822401DF40029BEE7 /* LineChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F74EF7722401DF40029BEE7 /* LineChart.swift */; };
+		3F77CFF92239AF7900D0796C /* PiePlainTextLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F77CFF82239AF7900D0796C /* PiePlainTextLayer.swift */; };
+		3F77CFFB2239AFAB00D0796C /* PieLineTextLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F77CFFA2239AFAB00D0796C /* PieLineTextLayer.swift */; };
+		3F77D0142239B15C00D0796C /* PieSliceLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F77D0132239B15C00D0796C /* PieSliceLayer.swift */; };
+		3F77D0162239B18B00D0796C /* PieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F77D0152239B18B00D0796C /* PieChart.swift */; };
+		3F77D01C223AD36400D0796C /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F77D01B223AD36400D0796C /* Extensions.swift */; };
+		3F8DC9E1227151320082622F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3F8DC9E0227151320082622F /* GoogleService-Info.plist */; };
+		3FC23E742224CF99005D3090 /* LiquidCrystal-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3FC23E702224CDF8005D3090 /* LiquidCrystal-Bold.otf */; };
+		3FC23E752224CF99005D3090 /* LiquidCrystal-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3FC23E722224CDF8005D3090 /* LiquidCrystal-BoldItalic.otf */; };
+		3FC23E762224CF99005D3090 /* LiquidCrystal-ExBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3FC23E732224CDF8005D3090 /* LiquidCrystal-ExBold.otf */; };
+		3FC23E772224CF99005D3090 /* LiquidCrystal-ExBoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3FC23E6F2224CDF8005D3090 /* LiquidCrystal-ExBoldItalic.otf */; };
+		3FC23E782224CF99005D3090 /* LiquidCrystal-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3FC23E712224CDF8005D3090 /* LiquidCrystal-Light.otf */; };
+		3FC23E792224CF99005D3090 /* LiquidCrystal-LightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3FC23E6D2224CDF8005D3090 /* LiquidCrystal-LightItalic.otf */; };
+		3FC23E7A2224CF99005D3090 /* LiquidCrystal-Normal.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3FC23E6C2224CDF8005D3090 /* LiquidCrystal-Normal.otf */; };
+		3FC23E7B2224CF99005D3090 /* LiquidCrystal-NormalItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3FC23E6E2224CDF8005D3090 /* LiquidCrystal-NormalItalic.otf */; };
+		3FC23E7E2226262D005D3090 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FC23E7D2226262D005D3090 /* QuartzCore.framework */; };
+		3FC23E8022262644005D3090 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FC23E7F22262644005D3090 /* UIKit.framework */; };
+		3FC23E822226264A005D3090 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FC23E812226264A005D3090 /* CoreGraphics.framework */; };
+		3FE623132270DFA700BAAD15 /* InputHelperFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE623122270DFA700BAAD15 /* InputHelperFunctions.swift */; };
+		3FED7B2722458CF500A8F676 /* Metropolis-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3F7B4B5E22458AE900C1F62B /* Metropolis-Black.otf */; };
+		3FED7B2822458CF500A8F676 /* Metropolis-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3F7B4B5C22458AE800C1F62B /* Metropolis-Bold.otf */; };
+		3FED7B2922458CF500A8F676 /* Metropolis-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3F7B4B6122458AE900C1F62B /* Metropolis-ExtraBold.otf */; };
+		3FED7B2A22458CF500A8F676 /* Metropolis-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3F7B4B5D22458AE900C1F62B /* Metropolis-Light.otf */; };
+		3FED7B2B22458CF500A8F676 /* Metropolis-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3F7B4B6022458AE900C1F62B /* Metropolis-Regular.otf */; };
+		3FED7B2C22458CF500A8F676 /* Metropolis-Thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3F7B4B5F22458AE900C1F62B /* Metropolis-Thin.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,10 +74,22 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2581D84476E12BCAC9D8626C /* Pods-SporTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SporTests.release.xcconfig"; path = "Target Support Files/Pods-SporTests/Pods-SporTests.release.xcconfig"; sourceTree = "<group>"; };
+		3F03261E2257E67600E6903A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		3F0DA8E2227795E3003E56E7 /* VCSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCSummary.swift; sourceTree = "<group>"; };
+		3F0DA8E72277A3F2003E56E7 /* VCBreakdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VCBreakdown.swift; path = /Users/MatthewRieger/Documents/Work/Spor/Spor/Spor/Dashboards/VCBreakdown.swift; sourceTree = "<absolute>"; };
+		3F0DA8E92277AD5B003E56E7 /* VCPieCharts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCPieCharts.swift; sourceTree = "<group>"; };
+		3F0DA8EB2277B0F3003E56E7 /* VCLineCharts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCLineCharts.swift; sourceTree = "<group>"; };
+		3F45D0D922555EF000E2AB7D /* VCLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCLogin.swift; sourceTree = "<group>"; };
+		3F5024F72227289500EF40BA /* Spor.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Spor.xcdatamodel; sourceTree = "<group>"; };
+		3F50253E222825D100EF40BA /* Designables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Designables.swift; sourceTree = "<group>"; };
+		3F5637782233224200F80125 /* CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreData.swift; sourceTree = "<group>"; };
+		3F60A92A22790D7D003D6D6B /* VCNewTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCNewTransaction.swift; sourceTree = "<group>"; };
+		3F60A92E227914C1003D6D6B /* VCEditTransactions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCEditTransactions.swift; sourceTree = "<group>"; };
+		3F60A93022791A04003D6D6B /* VCSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCSettings.swift; sourceTree = "<group>"; };
+		3F60A933227948DA003D6D6B /* Variables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variables.swift; sourceTree = "<group>"; };
 		3F6C9F932224BE8F0080336C /* Spor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F6C9F962224BE8F0080336C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		3F6C9F982224BE8F0080336C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		3F6C9F9B2224BE8F0080336C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		3F6C9F9D2224BE920080336C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3F6C9FA02224BE920080336C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3F6C9FA22224BE920080336C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -47,6 +99,41 @@
 		3F6C9FB22224BE920080336C /* SporUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SporUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F6C9FB62224BE920080336C /* SporUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SporUITests.swift; sourceTree = "<group>"; };
 		3F6C9FB82224BE920080336C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3F74EF6E223F275B0029BEE7 /* Segues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segues.swift; sourceTree = "<group>"; };
+		3F74EF7722401DF40029BEE7 /* LineChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineChart.swift; sourceTree = "<group>"; };
+		3F77CFF82239AF7900D0796C /* PiePlainTextLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiePlainTextLayer.swift; sourceTree = "<group>"; };
+		3F77CFFA2239AFAB00D0796C /* PieLineTextLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieLineTextLayer.swift; sourceTree = "<group>"; };
+		3F77D0132239B15C00D0796C /* PieSliceLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieSliceLayer.swift; sourceTree = "<group>"; };
+		3F77D0152239B18B00D0796C /* PieChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieChart.swift; sourceTree = "<group>"; };
+		3F77D01B223AD36400D0796C /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		3F7B4B5C22458AE800C1F62B /* Metropolis-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Metropolis-Bold.otf"; sourceTree = "<group>"; };
+		3F7B4B5D22458AE900C1F62B /* Metropolis-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Metropolis-Light.otf"; sourceTree = "<group>"; };
+		3F7B4B5E22458AE900C1F62B /* Metropolis-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Metropolis-Black.otf"; sourceTree = "<group>"; };
+		3F7B4B5F22458AE900C1F62B /* Metropolis-Thin.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Metropolis-Thin.otf"; sourceTree = "<group>"; };
+		3F7B4B6022458AE900C1F62B /* Metropolis-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Metropolis-Regular.otf"; sourceTree = "<group>"; };
+		3F7B4B6122458AE900C1F62B /* Metropolis-ExtraBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Metropolis-ExtraBold.otf"; sourceTree = "<group>"; };
+		3F8DC9E0227151320082622F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		3FC23E6C2224CDF8005D3090 /* LiquidCrystal-Normal.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "LiquidCrystal-Normal.otf"; path = "../../../../../../Library/Fonts/LiquidCrystal-Normal.otf"; sourceTree = "<group>"; };
+		3FC23E6D2224CDF8005D3090 /* LiquidCrystal-LightItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "LiquidCrystal-LightItalic.otf"; path = "../../../../../../Library/Fonts/LiquidCrystal-LightItalic.otf"; sourceTree = "<group>"; };
+		3FC23E6E2224CDF8005D3090 /* LiquidCrystal-NormalItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "LiquidCrystal-NormalItalic.otf"; path = "../../../../../../Library/Fonts/LiquidCrystal-NormalItalic.otf"; sourceTree = "<group>"; };
+		3FC23E6F2224CDF8005D3090 /* LiquidCrystal-ExBoldItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "LiquidCrystal-ExBoldItalic.otf"; path = "../../../../../../Library/Fonts/LiquidCrystal-ExBoldItalic.otf"; sourceTree = "<group>"; };
+		3FC23E702224CDF8005D3090 /* LiquidCrystal-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "LiquidCrystal-Bold.otf"; path = "../../../../../../Library/Fonts/LiquidCrystal-Bold.otf"; sourceTree = "<group>"; };
+		3FC23E712224CDF8005D3090 /* LiquidCrystal-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "LiquidCrystal-Light.otf"; path = "../../../../../../Library/Fonts/LiquidCrystal-Light.otf"; sourceTree = "<group>"; };
+		3FC23E722224CDF8005D3090 /* LiquidCrystal-BoldItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "LiquidCrystal-BoldItalic.otf"; path = "../../../../../../Library/Fonts/LiquidCrystal-BoldItalic.otf"; sourceTree = "<group>"; };
+		3FC23E732224CDF8005D3090 /* LiquidCrystal-ExBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "LiquidCrystal-ExBold.otf"; path = "../../../../../../Library/Fonts/LiquidCrystal-ExBold.otf"; sourceTree = "<group>"; };
+		3FC23E7D2226262D005D3090 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		3FC23E7F22262644005D3090 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		3FC23E812226264A005D3090 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		3FE62311226FB2C400BAAD15 /* Spor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Spor.entitlements; sourceTree = "<group>"; };
+		3FE623122270DFA700BAAD15 /* InputHelperFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHelperFunctions.swift; sourceTree = "<group>"; };
+		4F6AF64457237D18FD0230C1 /* Pods_SporTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SporTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		562D18AEE4C7CACF34AEB4B0 /* Pods_Spor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Spor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5D30132C1BFCAF4F65AEFEDE /* Pods-Spor.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Spor.debug.xcconfig"; path = "Target Support Files/Pods-Spor/Pods-Spor.debug.xcconfig"; sourceTree = "<group>"; };
+		73121B5DA9C6DF2EB5209E17 /* Pods_SporUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SporUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9181660BD817165F5969B4A7 /* Pods-SporUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SporUITests.debug.xcconfig"; path = "Target Support Files/Pods-SporUITests/Pods-SporUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		9576D8D2367E0859AFDB97A8 /* Pods-SporTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SporTests.debug.xcconfig"; path = "Target Support Files/Pods-SporTests/Pods-SporTests.debug.xcconfig"; sourceTree = "<group>"; };
+		963075E3CEC4CAFD7E580828 /* Pods-SporUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SporUITests.release.xcconfig"; path = "Target Support Files/Pods-SporUITests/Pods-SporUITests.release.xcconfig"; sourceTree = "<group>"; };
+		D9F1EEE609267723B93CEA48 /* Pods-Spor.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Spor.release.xcconfig"; path = "Target Support Files/Pods-Spor/Pods-Spor.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +141,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FC23E822226264A005D3090 /* CoreGraphics.framework in Frameworks */,
+				3FC23E8022262644005D3090 /* UIKit.framework in Frameworks */,
+				3FC23E7E2226262D005D3090 /* QuartzCore.framework in Frameworks */,
+				2F784EE98DFB6CE0C2060534 /* Pods_Spor.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,6 +152,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B9FC48961B8DE51B5079695 /* Pods_SporTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,12 +160,72 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1ACABEFE2780AFF8FA3B1E06 /* Pods_SporUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3F0DA8E42277A396003E56E7 /* Dashboards */ = {
+			isa = PBXGroup;
+			children = (
+				3F0DA8E2227795E3003E56E7 /* VCSummary.swift */,
+				3F0DA8E72277A3F2003E56E7 /* VCBreakdown.swift */,
+				3F0DA8E52277A3B1003E56E7 /* PieCharts */,
+				3F0DA8E62277A3BF003E56E7 /* LineCharts */,
+			);
+			path = Dashboards;
+			sourceTree = "<group>";
+		};
+		3F0DA8E52277A3B1003E56E7 /* PieCharts */ = {
+			isa = PBXGroup;
+			children = (
+				3F0DA8E92277AD5B003E56E7 /* VCPieCharts.swift */,
+				3F77D0152239B18B00D0796C /* PieChart.swift */,
+				3F77D0132239B15C00D0796C /* PieSliceLayer.swift */,
+				3F77CFFA2239AFAB00D0796C /* PieLineTextLayer.swift */,
+				3F77CFF82239AF7900D0796C /* PiePlainTextLayer.swift */,
+			);
+			path = PieCharts;
+			sourceTree = "<group>";
+		};
+		3F0DA8E62277A3BF003E56E7 /* LineCharts */ = {
+			isa = PBXGroup;
+			children = (
+				3F74EF7722401DF40029BEE7 /* LineChart.swift */,
+				3F0DA8EB2277B0F3003E56E7 /* VCLineCharts.swift */,
+			);
+			path = LineCharts;
+			sourceTree = "<group>";
+		};
+		3F50253C2228259500EF40BA /* Globals */ = {
+			isa = PBXGroup;
+			children = (
+				3F6C9F9D2224BE920080336C /* Assets.xcassets */,
+				3F8DC9E0227151320082622F /* GoogleService-Info.plist */,
+				3F5024F62227289500EF40BA /* Spor.xcdatamodeld */,
+				3F6C9F962224BE8F0080336C /* AppDelegate.swift */,
+				3F5637782233224200F80125 /* CoreData.swift */,
+				3F50253E222825D100EF40BA /* Designables.swift */,
+				3F77D01B223AD36400D0796C /* Extensions.swift */,
+				3F74EF6E223F275B0029BEE7 /* Segues.swift */,
+				3F60A933227948DA003D6D6B /* Variables.swift */,
+			);
+			path = Globals;
+			sourceTree = "<group>";
+		};
+		3F60A93222794870003D6D6B /* Input */ = {
+			isa = PBXGroup;
+			children = (
+				3F60A92A22790D7D003D6D6B /* VCNewTransaction.swift */,
+				3F60A92E227914C1003D6D6B /* VCEditTransactions.swift */,
+				3F60A93022791A04003D6D6B /* VCSettings.swift */,
+				3FE623122270DFA700BAAD15 /* InputHelperFunctions.swift */,
+			);
+			path = Input;
+			sourceTree = "<group>";
+		};
 		3F6C9F8A2224BE8F0080336C = {
 			isa = PBXGroup;
 			children = (
@@ -81,6 +233,8 @@
 				3F6C9FAA2224BE920080336C /* SporTests */,
 				3F6C9FB52224BE920080336C /* SporUITests */,
 				3F6C9F942224BE8F0080336C /* Products */,
+				3FC23E7C2226262C005D3090 /* Frameworks */,
+				60EE607D085B46347063812C /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -97,12 +251,15 @@
 		3F6C9F952224BE8F0080336C /* Spor */ = {
 			isa = PBXGroup;
 			children = (
-				3F6C9F962224BE8F0080336C /* AppDelegate.swift */,
-				3F6C9F982224BE8F0080336C /* ViewController.swift */,
-				3F6C9F9A2224BE8F0080336C /* Main.storyboard */,
-				3F6C9F9D2224BE920080336C /* Assets.xcassets */,
-				3F6C9F9F2224BE920080336C /* LaunchScreen.storyboard */,
+				3FE62311226FB2C400BAAD15 /* Spor.entitlements */,
+				3F0DA8E42277A396003E56E7 /* Dashboards */,
 				3F6C9FA22224BE920080336C /* Info.plist */,
+				3F6C9F9F2224BE920080336C /* LaunchScreen.storyboard */,
+				3F03261D2257E67600E6903A /* Main.storyboard */,
+				3F45D0D922555EF000E2AB7D /* VCLogin.swift */,
+				3F60A93222794870003D6D6B /* Input */,
+				3F50253C2228259500EF40BA /* Globals */,
+				3FC23E602224CBF6005D3090 /* Fonts */,
 			);
 			path = Spor;
 			sourceTree = "<group>";
@@ -125,6 +282,53 @@
 			path = SporUITests;
 			sourceTree = "<group>";
 		};
+		3FC23E602224CBF6005D3090 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				3F7B4B5E22458AE900C1F62B /* Metropolis-Black.otf */,
+				3F7B4B5C22458AE800C1F62B /* Metropolis-Bold.otf */,
+				3F7B4B6122458AE900C1F62B /* Metropolis-ExtraBold.otf */,
+				3F7B4B5D22458AE900C1F62B /* Metropolis-Light.otf */,
+				3F7B4B6022458AE900C1F62B /* Metropolis-Regular.otf */,
+				3F7B4B5F22458AE900C1F62B /* Metropolis-Thin.otf */,
+				3FC23E702224CDF8005D3090 /* LiquidCrystal-Bold.otf */,
+				3FC23E722224CDF8005D3090 /* LiquidCrystal-BoldItalic.otf */,
+				3FC23E732224CDF8005D3090 /* LiquidCrystal-ExBold.otf */,
+				3FC23E6F2224CDF8005D3090 /* LiquidCrystal-ExBoldItalic.otf */,
+				3FC23E712224CDF8005D3090 /* LiquidCrystal-Light.otf */,
+				3FC23E6D2224CDF8005D3090 /* LiquidCrystal-LightItalic.otf */,
+				3FC23E6C2224CDF8005D3090 /* LiquidCrystal-Normal.otf */,
+				3FC23E6E2224CDF8005D3090 /* LiquidCrystal-NormalItalic.otf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		3FC23E7C2226262C005D3090 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3FC23E812226264A005D3090 /* CoreGraphics.framework */,
+				3FC23E7F22262644005D3090 /* UIKit.framework */,
+				3FC23E7D2226262D005D3090 /* QuartzCore.framework */,
+				562D18AEE4C7CACF34AEB4B0 /* Pods_Spor.framework */,
+				4F6AF64457237D18FD0230C1 /* Pods_SporTests.framework */,
+				73121B5DA9C6DF2EB5209E17 /* Pods_SporUITests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		60EE607D085B46347063812C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				5D30132C1BFCAF4F65AEFEDE /* Pods-Spor.debug.xcconfig */,
+				D9F1EEE609267723B93CEA48 /* Pods-Spor.release.xcconfig */,
+				9576D8D2367E0859AFDB97A8 /* Pods-SporTests.debug.xcconfig */,
+				2581D84476E12BCAC9D8626C /* Pods-SporTests.release.xcconfig */,
+				9181660BD817165F5969B4A7 /* Pods-SporUITests.debug.xcconfig */,
+				963075E3CEC4CAFD7E580828 /* Pods-SporUITests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -132,9 +336,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3F6C9FBB2224BE920080336C /* Build configuration list for PBXNativeTarget "Spor" */;
 			buildPhases = (
+				F9CE3DF2EF03253DCDCA1EB8 /* [CP] Check Pods Manifest.lock */,
 				3F6C9F8F2224BE8F0080336C /* Sources */,
 				3F6C9F902224BE8F0080336C /* Frameworks */,
 				3F6C9F912224BE8F0080336C /* Resources */,
+				333BD1CE83047774EC32C34C /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -149,6 +355,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3F6C9FBE2224BE920080336C /* Build configuration list for PBXNativeTarget "SporTests" */;
 			buildPhases = (
+				67DA5ACB09E78DEF82569EE5 /* [CP] Check Pods Manifest.lock */,
 				3F6C9FA32224BE920080336C /* Sources */,
 				3F6C9FA42224BE920080336C /* Frameworks */,
 				3F6C9FA52224BE920080336C /* Resources */,
@@ -167,6 +374,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3F6C9FC12224BE920080336C /* Build configuration list for PBXNativeTarget "SporUITests" */;
 			buildPhases = (
+				BB6ADE472A66F5C1E7A5338F /* [CP] Check Pods Manifest.lock */,
 				3F6C9FAE2224BE920080336C /* Sources */,
 				3F6C9FAF2224BE920080336C /* Frameworks */,
 				3F6C9FB02224BE920080336C /* Resources */,
@@ -193,6 +401,17 @@
 				TargetAttributes = {
 					3F6C9F922224BE8F0080336C = {
 						CreatedOnToolsVersion = 10.1;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 0;
+							};
+							com.apple.BackgroundModes = {
+								enabled = 0;
+							};
+							com.apple.Push = {
+								enabled = 0;
+							};
+						};
 					};
 					3F6C9FA62224BE920080336C = {
 						CreatedOnToolsVersion = 10.1;
@@ -229,9 +448,24 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FED7B2722458CF500A8F676 /* Metropolis-Black.otf in Resources */,
+				3FED7B2822458CF500A8F676 /* Metropolis-Bold.otf in Resources */,
+				3FED7B2922458CF500A8F676 /* Metropolis-ExtraBold.otf in Resources */,
+				3FED7B2A22458CF500A8F676 /* Metropolis-Light.otf in Resources */,
+				3FED7B2B22458CF500A8F676 /* Metropolis-Regular.otf in Resources */,
+				3FED7B2C22458CF500A8F676 /* Metropolis-Thin.otf in Resources */,
+				3FC23E742224CF99005D3090 /* LiquidCrystal-Bold.otf in Resources */,
+				3FC23E752224CF99005D3090 /* LiquidCrystal-BoldItalic.otf in Resources */,
+				3FC23E762224CF99005D3090 /* LiquidCrystal-ExBold.otf in Resources */,
+				3FC23E772224CF99005D3090 /* LiquidCrystal-ExBoldItalic.otf in Resources */,
+				3FC23E782224CF99005D3090 /* LiquidCrystal-Light.otf in Resources */,
+				3F8DC9E1227151320082622F /* GoogleService-Info.plist in Resources */,
+				3FC23E792224CF99005D3090 /* LiquidCrystal-LightItalic.otf in Resources */,
+				3FC23E7A2224CF99005D3090 /* LiquidCrystal-Normal.otf in Resources */,
+				3FC23E7B2224CF99005D3090 /* LiquidCrystal-NormalItalic.otf in Resources */,
 				3F6C9FA12224BE920080336C /* LaunchScreen.storyboard in Resources */,
 				3F6C9F9E2224BE920080336C /* Assets.xcassets in Resources */,
-				3F6C9F9C2224BE8F0080336C /* Main.storyboard in Resources */,
+				3F03261F2257E67600E6903A /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -251,12 +485,128 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		333BD1CE83047774EC32C34C /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Spor/Pods-Spor-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Spor/Pods-Spor-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		67DA5ACB09E78DEF82569EE5 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SporTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BB6ADE472A66F5C1E7A5338F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SporUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F9CE3DF2EF03253DCDCA1EB8 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Spor-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		3F6C9F8F2224BE8F0080336C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3F6C9F992224BE8F0080336C /* ViewController.swift in Sources */,
+				3F0DA8E3227795E3003E56E7 /* VCSummary.swift in Sources */,
+				3F0DA8EA2277AD5B003E56E7 /* VCPieCharts.swift in Sources */,
+				3F77CFFB2239AFAB00D0796C /* PieLineTextLayer.swift in Sources */,
+				3F77CFF92239AF7900D0796C /* PiePlainTextLayer.swift in Sources */,
+				3F56377C2233224200F80125 /* CoreData.swift in Sources */,
+				3F60A92B22790D7D003D6D6B /* VCNewTransaction.swift in Sources */,
+				3F50253F222825D100EF40BA /* Designables.swift in Sources */,
+				3F77D0142239B15C00D0796C /* PieSliceLayer.swift in Sources */,
+				3F45D0DA22555EF000E2AB7D /* VCLogin.swift in Sources */,
+				3F74EF7822401DF40029BEE7 /* LineChart.swift in Sources */,
+				3F60A93122791A04003D6D6B /* VCSettings.swift in Sources */,
+				3F77D01C223AD36400D0796C /* Extensions.swift in Sources */,
+				3FE623132270DFA700BAAD15 /* InputHelperFunctions.swift in Sources */,
+				3F0DA8E82277A3F2003E56E7 /* VCBreakdown.swift in Sources */,
+				3F5024F82227289500EF40BA /* Spor.xcdatamodeld in Sources */,
+				3F60A934227948DA003D6D6B /* Variables.swift in Sources */,
+				3F74EF6F223F275B0029BEE7 /* Segues.swift in Sources */,
+				3F60A92F227914C1003D6D6B /* VCEditTransactions.swift in Sources */,
+				3F0DA8EC2277B0F3003E56E7 /* VCLineCharts.swift in Sources */,
+				3F77D0162239B18B00D0796C /* PieChart.swift in Sources */,
 				3F6C9F972224BE8F0080336C /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -293,10 +643,10 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		3F6C9F9A2224BE8F0080336C /* Main.storyboard */ = {
+		3F03261D2257E67600E6903A /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				3F6C9F9B2224BE8F0080336C /* Base */,
+				3F03261E2257E67600E6903A /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -364,6 +714,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_NO_PIE = NO;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -411,6 +762,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -419,6 +771,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_NO_PIE = NO;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -430,17 +783,21 @@
 		};
 		3F6C9FBC2224BE920080336C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D30132C1BFCAF4F65AEFEDE /* Pods-Spor.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 7EF58748FQ;
+				DEVELOPMENT_TEAM = G247BEM6XK;
 				INFOPLIST_FILE = Spor/Info.plist;
+				LD_NO_PIE = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.Escargot.Spor;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Escargot.SporByEscargot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -448,17 +805,21 @@
 		};
 		3F6C9FBD2224BE920080336C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D9F1EEE609267723B93CEA48 /* Pods-Spor.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 7EF58748FQ;
+				DEVELOPMENT_TEAM = G247BEM6XK;
 				INFOPLIST_FILE = Spor/Info.plist;
+				LD_NO_PIE = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.Escargot.Spor;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Escargot.SporByEscargot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -466,12 +827,14 @@
 		};
 		3F6C9FBF2224BE920080336C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9576D8D2367E0859AFDB97A8 /* Pods-SporTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7EF58748FQ;
 				INFOPLIST_FILE = SporTests/Info.plist;
+				LD_NO_PIE = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -487,12 +850,14 @@
 		};
 		3F6C9FC02224BE920080336C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2581D84476E12BCAC9D8626C /* Pods-SporTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7EF58748FQ;
 				INFOPLIST_FILE = SporTests/Info.plist;
+				LD_NO_PIE = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -508,11 +873,13 @@
 		};
 		3F6C9FC22224BE920080336C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9181660BD817165F5969B4A7 /* Pods-SporUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7EF58748FQ;
 				INFOPLIST_FILE = SporUITests/Info.plist;
+				LD_NO_PIE = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -528,11 +895,13 @@
 		};
 		3F6C9FC32224BE920080336C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 963075E3CEC4CAFD7E580828 /* Pods-SporUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7EF58748FQ;
 				INFOPLIST_FILE = SporUITests/Info.plist;
+				LD_NO_PIE = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -586,6 +955,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		3F5024F62227289500EF40BA /* Spor.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				3F5024F72227289500EF40BA /* Spor.xcdatamodel */,
+			);
+			currentVersion = 3F5024F72227289500EF40BA /* Spor.xcdatamodel */;
+			path = Spor.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 3F6C9F8B2224BE8F0080336C /* Project object */;
 }
