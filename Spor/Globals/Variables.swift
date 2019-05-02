@@ -1,12 +1,9 @@
-////////////////////////////////////////////////////////////////////////////////
+////////10////////20////////30////////40////////50////////60////////70////////80
 import UIKit
 import Firebase
 
 //used by "PieChart.swift" and "VCPieCharts.swift"
 var pies = [PieChart]()
-
-//set in "VCNewTransaction" and used by "PieChart.swift" and "VCLineCharts.swift"
-var screenHeight = 100.0
 
 //used by "VCEditTransactions.swift" and "InputHelperFunctions.swift"
 var globalAscending = true
@@ -21,9 +18,9 @@ var globalDeleteButton = DesignableButton()
 var globalBudgetField = UITextField()
 
 //used by most classes
-var categories = [Category]()
-var transactions = [Transaction]()
-var firebaseReference: DatabaseReference?
+var ctgs = [Category]()
+var txns = [Transaction]()
+var dbr: DatabaseReference?
 let red          = UIColor(named: "Red")          ?? .red
 let teal         = UIColor(named: "Teal")         ?? .cyan
 let offWhite     = UIColor(named: "OffWhite")     ?? .white
@@ -61,4 +58,4 @@ let colors = [
     UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 1.0),
     UIColor(red: 0.60, green: 0.39, blue: 0.14, alpha: 1.0)
 ]
-////////////////////////////////////////////////////////////////////////////////
+////////10////////20////////30////////40////////50////////60////////70////////80

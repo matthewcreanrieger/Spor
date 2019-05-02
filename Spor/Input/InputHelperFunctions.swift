@@ -1,68 +1,44 @@
-//WORK IN PROGRESS
+////////10////////20////////30////////40////////50////////60////////70////////80
 import UIKit
 import CoreData
 import Firebase
 
-//used by most classes
-func fetchTransactions(sortBy: String, ascending: Bool) {
-    globalSortBy = sortBy
-    globalAscending = ascending
-    let transactionsFetch: NSFetchRequest<Transaction> = Transaction.fetchRequest()
-    switch sortBy {
-    case "Amount":        transactionsFetch.sortDescriptors = [NSSortDescriptor(key: #keyPath(Transaction.amount),   ascending: ascending)]
-    case "Category":      transactionsFetch.sortDescriptors = [NSSortDescriptor(key: #keyPath(Transaction.category), ascending: ascending)]
-    case "Date":          transactionsFetch.sortDescriptors = [NSSortDescriptor(key: #keyPath(Transaction.date),     ascending: ascending)]
-    case "Description":   transactionsFetch.sortDescriptors = [NSSortDescriptor(key: #keyPath(Transaction.title),    ascending: ascending)]
-    case "Transaction #": transactionsFetch.sortDescriptors = [NSSortDescriptor(key: #keyPath(Transaction.index),    ascending: ascending)]
-    default:              break
-    }
-    do {
-        transactions = try PersistenceService.context.fetch(transactionsFetch)
-        if sortBy == "Date" && ascending {
-            UserDefaults.standard.set(min(Date(), transactions.first?.date ?? Date()).toString(), forKey: "StartDate")
-        }
-        for transaction in transactions { transaction.selected = false }
-        PersistenceService.saveContext()
-    } catch {}
-}
+//each of the following functions are shared by "VCNewTransaction", "VCEditTransactions", and/or "VCSettings" to complete universal "Input" tasks
+//generally, these tasks involve setting appropriate UserDefault values, deleting or adding Transactions or Categories locally (via CoreData), and/or syncing updates with the user's data store (via Firebase)
 
-func createDefaults() {
+//create default values for most UserDefault variables if they don't already exist
+func setDefaults() {
+    //"Period" should be monthly unless it's already configured for the user in the Firebase data store
     if UserDefaults.standard.object(forKey: "Period") == nil {
-        if UserDefaults.standard.string(forKey: "UserID") == nil { UserDefaults.standard.set("Monthly", forKey: "Period") }
-        else {
-            firebaseReference?.child("Settings").child("Period").observeSingleEvent(of: .value, with: { snapshot in
-                if snapshot.exists() {
-                    if let val = snapshot.value as? String { UserDefaults.standard.set(val, forKey: "Period") }
-                } else {
-                    UserDefaults.standard.set("Monthly", forKey: "Period")
-                    firebaseReference?.child("Settings").updateChildValues([ "Period": "Monthly" ])
+        UserDefaults.standard.set("Monthly", forKey: "Period")
+        let key = dbr?.child("Settings").child("Period")
+        key?.observeSingleEvent(of: .value, with: { snap in
+            if snap.exists() {
+                if let val = snap.value as? String {
+                    UserDefaults.standard.set(val, forKey: "Period")
                 }
-            })
-        }
+            } else {
+                dbr?.child("Settings").updateChildValues(["Period": "Monthly"])
+            }
+        })
     }
-    if UserDefaults.standard.object(forKey: "Budget")      == nil                            { UserDefaults.standard.set(0.0, forKey: "Budget") }
-    if UserDefaults.standard.object(forKey: "ChartPeriod") == nil                            { UserDefaults.standard.set("M", forKey: "ChartPeriod") }
-    if UserDefaults.standard.object(forKey: "Currency")    == nil                            { UserDefaults.standard.set("$", forKey: "Currency") }
-    if UserDefaults.standard.object(forKey: "StartDate")   == nil || transactions.count == 0 { UserDefaults.standard.set(Date().toString(), forKey: "StartDate") }
+    if UserDefaults.standard.object(forKey: "Budget") == nil {
+        UserDefaults.standard.set(0.0, forKey: "Budget")
+    }
+    if UserDefaults.standard.object(forKey: "ChartPeriod") == nil {
+        UserDefaults.standard.set("M", forKey: "ChartPeriod")
+    }
+    if UserDefaults.standard.object(forKey: "Currency") == nil {
+        UserDefaults.standard.set("$", forKey: "Currency")
+    }
+    if UserDefaults.standard.object(forKey: "StartDate") == nil {
+        UserDefaults.standard.set(Date().toString(), forKey: "StartDate")
+    }
 }
 
-func addCategories(_ budgets: [Double], _ proportions: [Double], _ selected: [Bool], _ poss: [Bool], _ titles: [String]) {
-    for i in 0..<titles.count {
-        let category = Category(context: PersistenceService.context)
-        category.budget = UserDefaults.standard.double(forKey: "Budget") + budgets[i] > 999999.99 ? 999999.99 - UserDefaults.standard.double(forKey: "Budget") : budgets[i]
-        category.proportion = proportions[i]
-        category.selected = selected[i]
-        category.sign = poss[i]
-        category.title = titles[i].trimmingCharacters(in: .whitespacesAndNewlines).capitalized
-        categories.append(category)
-        UserDefaults.standard.set(UserDefaults.standard.double(forKey: "Budget") + category.budget, forKey: "Budget")
-    }
-    fetchCategories()
-    refreshTable()
-}
-
-func createDefaultCategories() {
-    let titles = [
+//creates default Categories; called if no categories exist
+func setDefaultCtgs() {
+    let ttls = [
         "Eating Out",
         "Entertainment",
         "Gifts",
@@ -74,162 +50,55 @@ func createDefaultCategories() {
         "Transportation",
         "Travel"
     ]
-    var budgets = [Double]()
-    var proportions = [Double]()
-    var selected = [Bool]()
-    var sign = [Bool]()
-    for i in 0..<titles.count {
-        budgets.append(100.0)
-        proportions.append(budgets[i] / (Double(titles.count) * budgets[i]))
-        selected.append(false)
-        sign.append(true)
+    var bdgs = [Double]()
+    var prts = [Double]()
+    for i in 0..<ttls.count {
+        bdgs.append(100.0)
+        prts.append(bdgs[i] / (Double(ttls.count) * bdgs[i]))
     }
-    addCategories(budgets, proportions, selected, sign, titles)
+    addCtgs(bdgs, prts, ttls)
 }
 
-func fetchCategories() {
-    PersistenceService.saveContext()
-    let categoriesFetch: NSFetchRequest<Category> = Category.fetchRequest()
-    categoriesFetch.sortDescriptors = [NSSortDescriptor(key: #keyPath(Category.title), ascending: true)]
-    do {
-        categories = try PersistenceService.context.fetch(categoriesFetch)
-        for category in categories {
-            if UserDefaults.standard.double(forKey: "Budget") != 0 {
-                category.proportion = category.budget / UserDefaults.standard.double(forKey: "Budget")
-            }
-            category.selected = false
-        }
-        PersistenceService.saveContext()
-    } catch {}
-}
-
-func checkForMissingCategories(_ vc: UIViewController) {
-    var categoryMissing = ""
-    var categoryTitles = [String]()
-    for category in categories { categoryTitles.append(category.title) }
-    for transaction in transactions {
-        if categoryTitles.firstIndex(of: transaction.category) == nil {
-            categoryMissing = transaction.category
-            break
-        }
-    }
-    if categories.count == 0 && transactions.count == 0 { createDefaultCategories() }
-    else if categoryMissing != "" {
-        var count = 0
-        for transaction in transactions {
-            if transaction.category == categoryMissing {
-                count += 1
-                transaction.selected = true
-            }
-        }
-        let alert = UIAlertController(title: "Category Missing", message: String(count) + (count > 1 ? " transactions" : " transaction") + " in the Ledger " + (count > 1 ? "are" : "is") + " categorized as " + categoryMissing + ", which has been deleted. Please take one of the following actions to continue:", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Re-add \"" + categoryMissing + "\" as a Category", style: .default, handler: {
-            action in
-            addCategories(
-                [categories.count > 0 ? UserDefaults.standard.double(forKey: "Budget") / Double(categories.count) : 100.0],
-                [1.0 / Double(categories.count + 1)],
-                [false],
-                [true],
-                [categoryMissing]
-            )
-            checkForMissingCategories(vc)
-        }))
-        alert.addAction(UIAlertAction(
-            title: "Recategorize " + (count > 1 ? "These Transactions..." : "This Transaction..."),
-            style: .default,
-            handler: { action in
-                vc.performSegue(withIdentifier: "EditTransactions" + (vc.title == "Settings" ? "" : "U"), sender: nil)
-            }
-        ))
-        alert.addAction(UIAlertAction(
-            title: "Delete " + (count > 1 ? "These Transactions" : "This Transaction"),
-            style: .destructive,
-            handler: { action in
-                count > 1 ? deleteTransactionsConfirm(vc, categoryMissing) : deleteTransactions(vc)
-            }
-        ))
-        vc.present(alert, animated: true, completion: nil)
-    }
-}
-
-func deleteTransactions(_ vc: UIViewController) {
-    for transaction in transactions.reversed() {
-        if transaction.selected {
-            if firebaseReference != nil { firebaseReference!.child("Transactions").child(String(format: "Transaction%06d", transaction.index)).removeValue() }
-            PersistenceService.context.delete(transaction)
-        }
+//create new Categories based on provided inputs then call "refreshSpecialFormatting(...)" in case "categoriesTable" is in view and needs updating
+func addCtgs(_ bdgs: [Double], _ prts: [Double], _ ttls: [String]) {
+    for i in 0..<ttls.count {
+        let ctg = Category(context: PersistenceService.context)
+        let bdg = UserDefaults.standard.double(forKey: "Budget")
+        ctg.budget = bdg + bdgs[i] > 999999.99 ? 999999.99 - bdg : bdgs[i]
+        ctg.proportion = prts[i]
+        ctg.selected = false
+        ctg.sign = true
+        ctg.title =
+            ttls[i].trimmingCharacters(in: .whitespacesAndNewlines).capitalized
+        //inserted at top of list so that the user can clearly see the update
+        ctgs.insert(ctg, at: 0)
+        UserDefaults.standard.set(bdg + ctg.budget, forKey: "Budget")
     }
     PersistenceService.saveContext()
-    if vc.title == "NewTransaction" { fetchTransactions(sortBy: "Date", ascending: false) }
-    else if vc.title == "EditTransactions" {
-        fetchTransactions(sortBy: globalSortBy, ascending: globalAscending)
-        refreshTable()
-    }
-    if firebaseReference != nil { firebaseUpdateCounters() }
-    checkForMissingCategories(vc)
+    refreshSpecialFormatting()
+    firebasePushCtgs()
 }
 
-func deleteTransactionsConfirm(_ vc: UIViewController, _ categoryMissing: String) {
-    var transactionCount = 0
-    for transaction in transactions { if transaction.selected { transactionCount += 1 } }
-    let numberFormatter = NumberFormatter()
-    numberFormatter.numberStyle = .decimal
-    let message = "All " + numberFormatter.string(from: NSNumber(value: transactionCount))! + (categoryMissing == "" ? " Selected Transactions?" : " Transactions Categorized As \"" + categoryMissing + "\"?")
-    let alert = UIAlertController(title: "Are You Sure You Want To Delete " + message, message: "This action cannot be undone.", preferredStyle: .alert)
-    alert.addAction(UIAlertAction(title: "Delete Transactions", style: .destructive, handler: { action in deleteTransactions(vc)        }))
-    alert.addAction(UIAlertAction(title: "Cancel",              style: .cancel,      handler: { action in checkForMissingCategories(vc) }))
-    vc.present(alert, animated: true, completion: nil)
-}
-
-func firebaseUpdateCounters() {
-    let updates: [AnyHashable: Any] = [
-        "Count": transactions.count,
-        "MaxIndex": transactions.max(by: { $0.index < $1.index })?.index ?? 0
-    ]
-    firebaseReference!.child("TransactionCounters").updateChildValues(updates)
-    firebasePush()
-}
-func firebasePush() {
-    firebaseReference!.child("TransactionCounters").child("Count").observeSingleEvent(of: .value, with: { snapshot in
-        if let count = snapshot.value as? Int {
-            firebaseReference!.child("TransactionCounters").child("MaxIndex").observeSingleEvent(of: .value, with: { snapshot in
-                if let maxIndex = snapshot.value as? Int {
-                    let maxIndexMismatch = maxIndex != transactions.max(by: { $0.index < $1.index })?.index ?? 0
-                    let countMismatch = count != transactions.count
-                    if (maxIndexMismatch || countMismatch) {
-                        firebaseReference!.child("Transactions").removeValue()
-                        for transaction in transactions {
-                            let updates: [AnyHashable: Any] = [
-                                "Amount":   transaction.amount,
-                                "Category": transaction.category,
-                                "Date":     transaction.date.toString(),
-                                "Index":    transaction.index,
-                                "Selected": transaction.selected,
-                                "Sign":     transaction.sign,
-                                "Title":    transaction.title
-                            ]
-                            firebaseReference!.child("Transactions").child(String(format: "Transaction%06d", transaction.index)).updateChildValues(updates)
-                        }
-                        firebaseUpdateCounters()
-                    }
-                }
-            })
-        }
-    })
+func firebasePushCtgs() {
     for i in 0..<20 {
-        let id = String(format: "Category%02d", i + 1)
-        let updates: [AnyHashable: Any] = [
-            "Budget":     i < categories.count ? categories[i].budget : 0.0,
-            "Proportion": i < categories.count ? categories[i].proportion : 0.05,
-            "Selected":   i < categories.count ? categories[i].selected : false,
-            "Sign":       i < categories.count ? categories[i].sign : true,
-            "Title":      i < categories.count ? categories[i].title : id
+        let ctgID = String(format: "Category%02d", i + 1)
+        let upd : [AnyHashable: Any] = [
+            "Budget":     i < ctgs.count ? ctgs[i].budget     : 0.0,
+            "Proportion": i < ctgs.count ? ctgs[i].proportion : 0.05,
+            "Selected":   i < ctgs.count ? ctgs[i].selected   : false,
+            "Sign":       i < ctgs.count ? ctgs[i].sign       : true,
+            "Title":      i < ctgs.count ? ctgs[i].title      : ctgID
         ]
-        firebaseReference!.child("Categories").child(id).updateChildValues(updates)
+        dbr?.child("Categories")
+            .child(ctgID).updateChildValues(upd)
     }
 }
 
-func refreshTable() {
+//use global references to either...
+//1. "VCSettings"'s "categoriesTable", "deleteButton", "changeButton", and "budgetField"...
+//2. "VCEditTransactions"'s "transactionsTable", "deleteButton", and "changeButton"...
+//...in order to apply appropriate special formatting when CoreData changes are made to "ctgs" or "txns"
+func refreshSpecialFormatting() {
     globalTable.backgroundColor = greyDarkest
     globalTable.tintColor = .white
     globalTable.reloadData()
@@ -237,5 +106,236 @@ func refreshTable() {
     globalDeleteButton.setTitleColor(greyDarker, for: .normal)
     globalDeleteButton.isEnabled = false
     globalChangeButton.backgroundColor = greyDark
-    globalBudgetField.text = String(format:"%.02f", UserDefaults.standard.double(forKey: "Budget")).currencyFormat()
+    let bdg = UserDefaults.standard.double(forKey: "Budget")
+    globalBudgetField.text = String(format:"%.02f", bdg).currencyFormat()
 }
+
+//called often to check that all Transactions have matching Categories
+//if a Category is identified as missing, present the user with the following options
+//1. Re-add the Category (which actually just creates a new Category with the same name and an automatically-calculated budget)
+//2. Delete all Transactions associated with that Category
+//3. Re-categorize the problematic Transactions (which just transitions the user to "EditTransactions")
+func checkCtgMissing(_ vc: UIViewController) {
+    var ctgMiss = ""
+    var ctgTtls = [String]()
+    for ctg in ctgs { ctgTtls.append(ctg.title) }
+    for txn in txns {
+        if ctgTtls.firstIndex(of: txn.category) == nil {
+            ctgMiss = txn.category
+            break
+        }
+    }
+    //create new default Categories if there are no Transactions and therefore no possibility of "ctgMiss" equaling anything but ""
+    //there must be Categories at all times or most core functionality is lost
+    if ctgs.count == 0 && txns.count == 0 && vc.title != "Settings" {
+        setDefaultCtgs()
+    }
+    else if ctgMiss != "" {
+        var ct = 0
+        for txn in txns {
+            if txn.category == ctgMiss {
+                ct += 1
+                txn.selected = true
+            }
+        }
+        let plr = ct > 1
+        let bdg = UserDefaults.standard.double(forKey: "Budget")
+        let alert = UIAlertController(
+            title: "Category Missing",
+            message: String(ct) + (plr ? " transactions" : " transaction") +
+                " in the Ledger " + (plr ? "are" : "is") + " categorized as " +
+                ctgMiss + ", which has been deleted. Please take one of the " +
+            "following actions to continue:",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(
+            title: "Re-add \"" + ctgMiss + "\" as a Category",
+            style: .default,
+            handler: {
+                action in
+                addCtgs(
+                    [ctgs.count > 0 ? bdg / Double(ctgs.count) : 100.0],
+                    [1.0 / Double(ctgs.count + 1)], [ctgMiss]
+                )
+                
+                //"checkCtgMissing(...)" is called repeatedly until there are no missing Categories, essentially blocking user input until discrepencies are resolved
+                checkCtgMissing(vc)
+        }
+        ))
+        alert.addAction(UIAlertAction(
+            title: "Recategorize Th" +
+                (plr ? "ese Transactions..." : "is Transaction..."),
+            style: .default,
+            handler: { action in
+                vc.performSegue(withIdentifier: "EditTransactions" +
+                    (vc.title == "Settings" ? "" : "U"), sender: nil)
+        }
+        ))
+        alert.addAction(UIAlertAction(
+            title: "Delete Th" + (plr ? "ese Transactions" : "is Transaction"),
+            style: .destructive,
+            handler: { action in
+                plr ? confirmTxnsDelete(vc, ctgMiss) : deleteTxns(vc)
+        }
+        ))
+        vc.present(alert, animated: true, completion: nil)
+    }
+}
+
+//if the user decides to delete more than 1 Transaction at once, this function is used to confirm that choice
+func confirmTxnsDelete(_ vc: UIViewController, _ ctgMissing: String) {
+    var ct = 0
+    for txn in txns { if txn.selected { ct += 1 } }
+    let fmt = NumberFormatter()
+    fmt.numberStyle = .decimal
+    let nmb = fmt.string(from: NSNumber(value: ct)) ?? ""
+    let ttl = ctgMissing == "" ? " Selected Transactions?" :
+        " Transactions Categorized As \"" + ctgMissing + "\"?"
+    let alert = UIAlertController(
+        title: "Are You Sure You Want To Delete All " + nmb + ttl,
+        message: "This action cannot be undone.",
+        preferredStyle: .alert
+    )
+    alert.addAction(UIAlertAction(
+        title: "Delete Transactions",
+        style: .destructive,
+        handler: { action in deleteTxns(vc) }
+    ))
+    alert.addAction(UIAlertAction(
+        title: "Cancel",
+        style: .cancel,
+        handler: { action in checkCtgMissing(vc) }
+    ))
+    vc.present(alert, animated: true, completion: nil)
+}
+
+//if the user only attempted to delete 1 transaction or has confirmed that they want to delete more than 1, this function is called
+func deleteTxns(_ vc: UIViewController) {
+    for txn in txns.reversed() {
+        if txn.selected {
+            //delete the matching Transaction in the data store
+            let child = String(format: "Transaction%06d", txn.index)
+            dbr?.child("Transactions").child(child).removeValue()
+            PersistenceService.context.delete(txn)
+        }
+    }
+    PersistenceService.saveContext()
+    
+    //if the user is on "EditTransactions", the data for "transactionsTable" must be refreshed in the same order as they initially chose it to appear for better UX
+    if vc.title == "EditTransactions" {
+        fetchTxns(sortBy: globalSortBy, asc: globalAscending)
+        refreshSpecialFormatting()
+    } else { fetchTxns(sortBy: "Date", asc: false) }
+    firebasePushTxns()
+    
+    //"checkCtgMissing(...)" is called repeatedly until there are no missing Categories, essentially blocking user input until discrepencies are resolved
+    checkCtgMissing(vc)
+}
+
+//fetch and sort local (CoreData) Categories
+func fetchCtgs() {
+    PersistenceService.saveContext()
+    let ctgFR: NSFetchRequest<Category> = Category.fetchRequest()
+    ctgFR.sortDescriptors =
+        [NSSortDescriptor(key: #keyPath(Category.title), ascending: true)]
+    do {
+        ctgs = try PersistenceService.context.fetch(ctgFR)
+        let bdg = UserDefaults.standard.double(forKey: "Budget")
+        for ctg in ctgs {
+            if bdg != 0 { ctg.proportion = ctg.budget / bdg }
+            ctg.selected = false
+        }
+        PersistenceService.saveContext()
+    } catch {}
+    firebasePushCtgs()
+}
+
+//fetch and sort local (CoreData) Transactions
+func fetchTxns(sortBy: String, asc: Bool) {
+    //these are set so that "transactionsTable" in "VCEditTransactions.swift" will still maintain its user-chosen sort order after the user deletes transactions
+    globalSortBy = sortBy
+    globalAscending = asc
+    
+    let txnFR: NSFetchRequest<Transaction> = Transaction.fetchRequest()
+    switch sortBy {
+    case "Amount":        txnFR.sortDescriptors = [NSSortDescriptor(
+                          key: #keyPath(Transaction.amount), ascending: asc)]
+    case "Category":      txnFR.sortDescriptors = [NSSortDescriptor(
+                          key: #keyPath(Transaction.category), ascending: asc)]
+    case "Date":          txnFR.sortDescriptors = [NSSortDescriptor(
+                          key: #keyPath(Transaction.date), ascending: asc)]
+    case "Description":   txnFR.sortDescriptors = [NSSortDescriptor(
+                          key: #keyPath(Transaction.title), ascending: asc)]
+    case "Transaction #": txnFR.sortDescriptors = [NSSortDescriptor(
+                          key: #keyPath(Transaction.index), ascending: asc)]
+    default: break
+    }
+    do {
+        txns = try PersistenceService.context.fetch(txnFR)
+        
+        //"StartDate" needs to be established before executing most "Dashboard"-related functions
+        //before transitioning to any "Dashboard" UIViewController, this function is called with "sortBy: "Date", asc: true", at which point "StartDate" can be set to the minimum between now and the user's first Transaction
+        //"StartDate" cannot be sooner than today or certain "Dashboard"-related functions will crash
+        let start = min(Date(), txns.first?.date ?? Date()).toString()
+        if sortBy == "Date" && asc {
+            UserDefaults.standard.set(start, forKey: "StartDate")
+        }
+        
+        //whether or not a Transaction or Category is selected determines if it is deleted when a delete function is called
+        //therefore, all Transactions and Categories are unselected at load to prevent accidental deletion
+        for txn in txns { txn.selected = false }
+        PersistenceService.saveContext()
+    } catch {}
+}
+
+//whenever Transactions are deleted or added, this function is called to update counters in the user's data store and then call "firebasePush(...)"
+func firebasePushTxns() {
+    let key = dbr?.child("TransactionCounters")
+    let upd: [AnyHashable: Any] = [
+        "Count": txns.count,
+        "MaxIndex": txns.max(by: { $0.index < $1.index })?.index ?? 0
+    ]
+    key?.updateChildValues(upd)
+    key?.child("Count").observeSingleEvent(of: .value, with: { snap in
+        if let ct = snap.value as? Int {
+            key?.child("MaxIndex").observeSingleEvent(of: .value, with: {snap in
+                if let mi = snap.value as? Int {
+                    let miMatch =
+                        mi == txns.max(by: { $0.index < $1.index })?.index ?? 0
+                    let ctMatch = ct == txns.count
+                    if !miMatch || !ctMatch {
+                        dbr?.child("Transactions").removeValue()
+                        for txn in txns {
+                            let updates: [AnyHashable: Any] = [
+                                "Amount":   txn.amount,
+                                "Category": txn.category,
+                                "Date":     txn.date.toString(),
+                                "Index":    txn.index,
+                                "Selected": txn.selected,
+                                "Sign":     txn.sign,
+                                "Title":    txn.title
+                            ]
+                            let child =
+                                String(format: "Transaction%06d", txn.index)
+                            dbr?.child("Transactions")
+                                .child(child).updateChildValues(updates)
+                        }
+                        firebasePushTxns()
+                    }
+                }
+            })
+        }
+    })
+}
+
+//this is just a micro helper function that prevents copy-pasting the same code into all "Input" .swift files
+func makeToolbar() -> UIToolbar {
+    let toolbar = UIToolbar(frame: CGRect.init(
+        x: 0, y: 0, width: UIScreen.main.bounds.width, height: 0))
+    toolbar.barStyle = .default
+    toolbar.barTintColor = greyDarkest
+    toolbar.sizeToFit()
+    toolbar.tintColor = .white
+    return toolbar
+}
+////////10////////20////////30////////40////////50////////60////////70////////80

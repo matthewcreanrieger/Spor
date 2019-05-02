@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+////////10////////20////////30////////40////////50////////60////////70////////80
 import UIKit
 
 class VCPieCharts: UIViewController, PieChartDelegate {
@@ -13,8 +13,6 @@ class VCPieCharts: UIViewController, PieChartDelegate {
         
         UserDefaults.standard.set(title, forKey: "LastScreen")
         UserDefaults.standard.set(title, forKey: "LastDashboard")
-        
-        fetchTransactions(sortBy: "Date", ascending: true)
         
         let swipeL = UISwipeGestureRecognizer(
             target: self, action: #selector(respondToSwipeGesture(_:)))
@@ -62,23 +60,23 @@ class VCPieCharts: UIViewController, PieChartDelegate {
         //this is why "currentPieEmpty" and "targetPieEmpty" are used to filter out empty pies
         var currentPieEmpty = true
         var targetPieEmpty = true
-        for cat in categories {
+        for ctg in ctgs {
             var cumulSpend = 0.0
-            for tra in transactions {
-                if tra.date > Date() { break }
-                else if tra.category == cat.title { cumulSpend -= tra.amount }
+            for txn in txns {
+                if txn.date > Date() { break }
+                else if txn.category == ctg.title { cumulSpend -= txn.amount }
             }
             if cumulSpend > 0 { currentPieEmpty = false }
             sliceModelsCurrent.append(PieSliceModel(
                 value: max(cumulSpend, 0),
-                description: cat.title,
-                color: colors[categories.firstIndex(of: cat)!]
+                description: ctg.title,
+                color: colors[ctgs.firstIndex(of: ctg) ?? 0]
             ))
-            if cat.budget > 0 { targetPieEmpty = false }
+            if ctg.budget > 0 { targetPieEmpty = false }
             sliceModelsTarget.append(PieSliceModel(
-                value: cat.proportion,
-                description: cat.title,
-                color: colors[categories.firstIndex(of: cat)!]
+                value: ctg.proportion,
+                description: ctg.title,
+                color: colors[ctgs.firstIndex(of: ctg) ?? 0]
             ))
         }
         if !currentPieEmpty { pies.append(currentPie) }
@@ -105,4 +103,4 @@ class VCPieCharts: UIViewController, PieChartDelegate {
         })
     }
 }
-////////////////////////////////////////////////////////////////////////////////
+////////10////////20////////30////////40////////50////////60////////70////////80

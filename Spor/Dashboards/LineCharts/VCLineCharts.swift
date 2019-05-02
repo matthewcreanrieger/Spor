@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+////////10////////20////////30////////40////////50////////60////////70////////80
 import UIKit
 import CoreData
 import Firebase
@@ -31,8 +31,6 @@ class VCLineCharts: UIViewController, ChartDelegate {
         //allows user to return to this screen after exiting "NewTransaction" or "EditTransactions"
         UserDefaults.standard.set(title, forKey: "LastDashboard")
         
-        fetchTransactions(sortBy: "Date", ascending: true)
-        
         //"swipeL", "swipeR", and "swipeU" are defined outside of "viewDidLoad(...)" because they are used in multiple functions
         swipeL = UISwipeGestureRecognizer(
             target: self, action: #selector(respondToSwipeGesture(_:)))
@@ -48,8 +46,8 @@ class VCLineCharts: UIViewController, ChartDelegate {
         view.addGestureRecognizer(swipeU)
         
         //"budgDiv" and "budgPerDay" are defined outside of "viewDidLoad(...)" because they are used in multiple functions
-        let period = UserDefaults.standard.string(forKey: "Period") ?? "Monthly"
-        switch period {
+        let prd = UserDefaults.standard.string(forKey: "Period") ?? "Monthly"
+        switch prd {
             case "Weekly":   budgDiv = 7.0
             case "Biweekly": budgDiv = 14.0
             case "Monthly":  budgDiv = 30.436875
@@ -57,16 +55,12 @@ class VCLineCharts: UIViewController, ChartDelegate {
             default: break
         }
         budgPerDay = UserDefaults.standard.double(forKey: "Budget") /  budgDiv
-        budgetLabel.text = period.uppercased() + " BUDGET"
+        budgetLabel.text = prd.uppercased() + " BUDGET"
 
-        //add toolbar with "Close" button to ".inputView" of "budgetField"
-        let toolbar = UIToolbar(frame: .init(x: 0, y: 0, width: 0, height: 0))
-        toolbar.barStyle = .default
-        toolbar.barTintColor = greyDarkest
-        toolbar.setItems([UIBarButtonItem(title: "Close", style: .plain, target:
-            self, action: #selector(closeButtonAction))], animated: true)
-        toolbar.sizeToFit()
-        toolbar.tintColor = .white
+        let btn = UIBarButtonItem(title: "Close", style: .plain, target: self,
+                                  action: #selector(closeButtonAction))
+        let toolbar = makeToolbar()
+        toolbar.setItems([btn], animated: true)
         budgetField.inputAccessoryView = toolbar
 
         budgetField.attributedPlaceholder = NSAttributedString(string:
@@ -148,33 +142,13 @@ class VCLineCharts: UIViewController, ChartDelegate {
     //if the user edits "budgetField", set "Budget" to the input value, update Firebase with new category budget values, and refresh "lineChart" to reflect the new value
     @IBAction func editBudgetField(_ sender: DesignableTextField) {
         let fmt = sender.text?.currencyFormat() ?? "$0.00"
-        let reFmt = fmt.suffix(fmt.count - 1).replacingOccurrences(
-            of: ",", with: "",
-            options: String.CompareOptions.literal,
-            range: nil
-        )
-        let value = Double(String(reFmt)) ?? 0
+        sender.text = fmt
+        let reFmt = String(fmt.suffix(fmt.count - 1))
+        let value = Double(reFmt.replacingOccurrences(
+            of: ",", with: "", options: .literal, range: nil)) ?? 0
         UserDefaults.standard.set(value, forKey: "Budget")
-        budgPerDay = value /  budgDiv
-        for cat in categories { cat.budget = cat.proportion * value }
-        PersistenceService.saveContext()
-        for i in 0..<20 {
-            let catID = String(format: "Category%02d", i + 1)
-            let updates : [AnyHashable: Any] = [
-                "Budget":
-                    i < categories.count ? categories[i].budget : 0.0,
-                "Proportion":
-                    i < categories.count ? categories[i].proportion : 0.05,
-                "Selected":
-                    i < categories.count ? categories[i].selected : false,
-                "Sign":
-                    i < categories.count ? categories[i].sign : true,
-                "Title":
-                    i < categories.count ? categories[i].title : catID
-            ]
-            firebaseReference?.child("Categories")
-                .child(catID).updateChildValues(updates)
-        }
+        for ctg in ctgs { ctg.budget = ctg.proportion * value }
+        fetchCtgs()
         refreshChart()
     }
     
@@ -214,7 +188,7 @@ class VCLineCharts: UIViewController, ChartDelegate {
         
         //create zero line data set
         var zeroLine = [(x: Int, y: Double)]()
-        for i in 1...scope { zeroLine.append((x: i, y: 0)) }
+        for i in 1...(scope + 1) { zeroLine.append((x: i, y: 0)) }
         
         //create over/under budget data set
         var overUnderLine = [(x: Int, y: Double)]()
@@ -222,9 +196,9 @@ class VCLineCharts: UIViewController, ChartDelegate {
         //each data point in "overUnderLine" is based on the user's cumulative spend for each day in scope; therefore, the first thing that needs to be done is to determine the cumulative spend up until "day1" so that the first data point accurately reflects the amount over/under budget at that time
         var yValue = 0.0
         var t = 0
-        for tra in transactions {
-            if tra.date <= day1 {
-                yValue -= tra.amount
+        for txn in txns {
+            if txn.date <= day1 {
+                yValue -= txn.amount
                 t += 1
             }
             else { break }
@@ -233,13 +207,12 @@ class VCLineCharts: UIViewController, ChartDelegate {
         //for each day in scope, add "i" and a cumulative calculation of "yValue" to "overUnderLine"
         var i = 1
         while i <= scope {
-            //if "t" is valid and the date of the transaction associated with "t" ("tra") matches the date associated with "i" ("match"), add the amount of that transaction to the cumulative "yValue" and increment "t"
-            let tra = transactions.count > 0 && t < transactions.count ?
-                transactions[t].date.toString() : nil
+            //if "t" is valid and the date of the transaction associated with "t" ("txn") matches the date associated with "i" ("match"), add the amount of that transaction to the cumulative "yValue" and increment "t"
+            let txn = txns.count > t ? txns[t].date.toString() : nil
             let match = (Calendar.current.date(byAdding: .day, value: -scope
                 + i, to: now.toString().toDate()) ?? now).toString()
-            if tra == match {
-                yValue -= transactions[t].amount
+            if txn == match {
+                yValue -= txns[t].amount
                 t += 1
             }
             //otherwise, supply "overUnderLine" with i for "x:" and a y value calculated based on "yValue" appropriate for the specific chart (percent vs. amount over budget)
@@ -260,8 +233,8 @@ class VCLineCharts: UIViewController, ChartDelegate {
                 overUnderLine.append((x: i, y: newY))
                 i += 1
                 
-                //add an extra data point for new users so that "lineChart" isn't blank
-                if scope == 1 { overUnderLine.append((x: i, y: newY)) }
+                //add an extra data point to show a flat line for today
+                if i > scope { overUnderLine.append((x: i, y: newY)) }
             }
         }
 
@@ -277,7 +250,7 @@ class VCLineCharts: UIViewController, ChartDelegate {
                 xLabels.append(Double(i))
             }
         } else {
-            for i in 0...6 {
+            for i in 0...5 {
                 xLabels.append(1 + Double(i) / 6.0 * Double(scope - 1))
             }
         }
@@ -353,11 +326,11 @@ class VCLineCharts: UIViewController, ChartDelegate {
                     String(Int(labelValue)) + "%"
             }
         } else {
-            let curr = UserDefaults.standard.string(forKey: "Currency") ?? "$"
+            let ccy = UserDefaults.standard.string(forKey: "Currency") ?? "$"
             lineChart.yLabelsFormatter = {
                 (labelIndex: Int, labelValue: Double) -> String in
                     (labelValue < 0 ? "(" : "")
-                        + curr + String(Int(abs(labelValue)))
+                        + ccy + String(Int(abs(labelValue)))
                         + (labelValue < 0 ? ")" : "")
             }
         }
@@ -381,11 +354,12 @@ class VCLineCharts: UIViewController, ChartDelegate {
         let value = chart.valueForSeries(1, atIndex: Int(x)-1) ?? 0
         
         //whether or not the value is positive and whether "lineChart" is an amount or percentage chart determines the format of the information presented
-        let overBudget = value < 0
+        let underBudget = value < 0
         let percentChart = (title ?? "").suffix(7) == "Percent"
         
         //"width" is used to determine whether the value of "lineChartValueLabel" should display on the right or left side of the line
         let width = Double(view.frame.width)
+        let screenHeight = Double(UIScreen.main.bounds.height)
         lineChartValueLabel = UILabel(frame: CGRect(
             //if the touch point is in the rightmost 25% of the screen, display the label on the left, otherwise display on the right
             x: left - width / 2 + ((left < width * 0.75) ? 50.0 : -30.0),
@@ -398,10 +372,10 @@ class VCLineCharts: UIViewController, ChartDelegate {
             String(format: "%.02f%%", value) :
             String(format: "%.02f", value).currencyFormat()
         lineChartValueLabel.text =
-            !overBudget && !percentChart ? "(" + lbl + ")" : lbl
+            underBudget && !percentChart ? "(" + lbl + ")" : lbl
         lineChartValueLabel.textAlignment = .center
-        lineChartValueLabel.textColor = overBudget ? red : teal
-        chart.highlightLineColor = overBudget ? red : teal
+        lineChartValueLabel.textColor = underBudget ? teal : red
+        chart.highlightLineColor = underBudget ? teal : red
         view.addSubview(lineChartValueLabel)
     }
     func didEndTouchingChart(_ chart: Chart) {
@@ -410,4 +384,4 @@ class VCLineCharts: UIViewController, ChartDelegate {
         view.addGestureRecognizer(swipeU)
     }
 }
-////////////////////////////////////////////////////////////////////////////////
+////////10////////20////////30////////40////////50////////60////////70////////80

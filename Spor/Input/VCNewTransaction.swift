@@ -1,81 +1,147 @@
-//WORK IN PROGRESS
+////////10////////20////////30////////40////////50////////60////////70////////80
 import UIKit
 import CoreData
 import Firebase
 
 class VCNewTransaction: UIViewController, UITextFieldDelegate {
     
-    let categoryPicker = UIPickerView()
-    var swipeU = UISwipeGestureRecognizer(target: self, action: nil)
-    @IBOutlet weak var activityIndicatorView: UIView!
-    @IBOutlet weak var addToLedgerButton: DesignableButton!
+    let ctgPkr = UIPickerView()
+    var datePkr = UIDatePicker()
+    var revenue = false
+    
+    @IBOutlet weak var entriesOutlineView: DesignableView!
+    @IBOutlet weak var revenueButton: DesignableButton!
+    @IBOutlet weak var expenseButton: DesignableButton!
     @IBOutlet weak var amountField: DesignableTextField!
+    @IBOutlet weak var titleField: DesignableTextField!
     @IBOutlet weak var categoryField: DesignableTextField!
     @IBOutlet weak var dateField: DesignableTextField!
-    @IBOutlet weak var titleField: DesignableTextField!
-    @IBOutlet weak var entriesOutlineView: DesignableView!
-    
-    var datePicker = UIDatePicker()
-    var lastCategoryPicked = 0
-    var swipeD = UISwipeGestureRecognizer(target: self, action: nil)
-    @IBOutlet weak var expenseButton: DesignableButton!
-    @IBOutlet weak var revenueButton: DesignableButton!
+    @IBOutlet weak var addToLedgerButton: DesignableButton!
     @IBOutlet weak var transactionsTable: UITableView!
+    @IBOutlet weak var activityIndicatorView: UIView!
 
-    var positive = false
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //enables user to return to this screen after exiting "Settings"
         UserDefaults.standard.set(title, forKey: "LastScreen")
         
-        lastCategoryPicked = 0
-        if UserDefaults.standard.string(forKey: "UserID") == nil { UserDefaults.standard.set(true, forKey: "FirebaseFetched") }
-        else if firebaseReference == nil { firebaseReference = Database.database().reference().child(UserDefaults.standard.string(forKey: "UserID")!) }
-        createDefaults()
-        createDatePicker()
-        fetchTransactions(sortBy: "Date", ascending: false)
-        fetchCategories()
+        //after the login workflow is complete...
+        //if the user did not log in, set the status of fetching info from the data store to complete
+        let userID = UserDefaults.standard.string(forKey: "UserID")
+        if userID == nil {
+            UserDefaults.standard.set(true, forKey: "FirebaseFetched")
+        }
+        //if the user did log in and the database reference is not already configured, configure it
+        else if dbr == nil {
+            dbr = Database.database().reference().child(userID!)
+        }
         
-        swipeD = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture(_:)))
-        swipeU = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture(_:)))
+        //set all required UserDefaults values
+        setDefaults()
+        
+        //fetch existing Transactions and Categories
+        let dbFetched = UserDefaults.standard.bool(forKey: "FirebaseFetched")
+        if dbFetched {
+            //Categories don't need to be fetched as often as Transactions; only fetch them here if there are none already, which should only happen after the Login workflow or at Launch
+            //if it's after a succesful login, this will be skipped in favor of "firebasePull(...)" because "dbFetched" will be false at this point
+            if ctgs.count == 0 { fetchCtgs() }
+            
+            //if there are still no Categories after a fetch attempt, create default Categories
+            if ctgs.count == 0 { setDefaultCtgs() }
+            
+            //Transactions are always fetched because they need to be sorted for "transactionsTable"
+            //"asc:" is set to false mostly so that the most recent Transactions are at top
+            fetchTxns(sortBy: "Date", asc: false)
+        }
+        //if the user just logged in, there will be no local transactions or categories and these should instead be pulled from the data store using "firebasePull(...)"
+        else { firebasePull() }
+
+        //configure swipe recognizers
+        let swipeD = UISwipeGestureRecognizer(
+            target: self, action: #selector(respondToSwipeGesture(_:)))
+        let swipeU = UISwipeGestureRecognizer(
+            target: self, action: #selector(respondToSwipeGesture(_:)))
         swipeD.direction = .down
         swipeU.direction = .up
         view.addGestureRecognizer(swipeD)
         view.addGestureRecognizer(swipeU)
         
-        if firebaseReference != nil {
-            UserDefaults.standard.bool(forKey: "FirebaseFetched") ? firebasePush() : firebasePull()
-        }
+        //configure text fields
+        let ccy = UserDefaults.standard.string(forKey: "Currency") ?? "$"
+        amountField.attributedPlaceholder = NSAttributedString(
+            string: ccy + "0.00",
+            attributes: [NSAttributedString.Key.foregroundColor: greyDark]
+        )
         
-        amountField.attributedPlaceholder = NSAttributedString(string: UserDefaults.standard.string(forKey: "Currency")! + "0.00", attributes: [NSAttributedString.Key.foregroundColor: greyDark])
-        amountField.font = UIFont(name: "Menlo", size: 20)
+        titleField.attributedPlaceholder = NSAttributedString(
+            string: "Short description",
+            attributes: [NSAttributedString.Key.foregroundColor: greyDark]
+        )
         
-        categoryField.attributedPlaceholder = NSAttributedString(string: "Select a Category", attributes: [NSAttributedString.Key.foregroundColor: greyDark])
-        categoryField.font = UIFont(name: "Menlo", size: 20)
-        categoryField.inputView = categoryPicker
-        categoryPicker.delegate = self
+        categoryField.attributedPlaceholder = NSAttributedString(
+            string: "Select a Category",
+            attributes: [NSAttributedString.Key.foregroundColor: greyDark]
+        )
+        categoryField.inputView = ctgPkr
+        ctgPkr.delegate = self
         
-        dateField.inputView = datePicker
+        //create and assign date picker for "dateField"
+        datePkr.addTarget(self, action: #selector(dateChanged(datePkr:)),
+                          for: .valueChanged)
+        datePkr.backgroundColor = greyDarkest
+        datePkr.datePickerMode = .date
+        var dateComponents = DateComponents()
+        dateComponents.year = -1
+        let yrAgo = Calendar.current.date(byAdding: dateComponents, to: Date())
+        let start = UserDefaults.standard.string(forKey: "StartDate")?.toDate()
+        datePkr.minimumDate = min(yrAgo ?? Date(), start ?? Date())
+        datePkr.setValue(UIColor.white, forKey: "textColor")
+        dateField.inputView = datePkr
         dateField.text = Date().toString()
         
-        titleField.attributedPlaceholder = NSAttributedString(string: "Short description", attributes: [NSAttributedString.Key.foregroundColor: greyDark])
-        titleField.autocapitalizationType = .sentences
-        titleField.font = UIFont(name: "Menlo", size: 20)
-        titleField.layer.borderWidth = 0
-        titleField.textColor = .white
+        //create "Close" button for each UITextField and configure them to close when the user taps outside of the input view
+        let btn = UIBarButtonItem(title: "Close", style: .plain, target: self,
+                                  action: #selector(closeButtonAction))
+        let toolbar = makeToolbar()
+        toolbar.setItems([btn], animated: true)
+        for field in [amountField, categoryField, dateField, titleField] {
+            field?.delegate = self
+            field?.inputAccessoryView = toolbar
+            field?.tintColor = .white
+        }
         
-        createToolbars([amountField, categoryField, dateField, titleField])
-        refreshTransactionsTable()
+        //configure the appearance of "transactionsTable"
+        transactionsTable.backgroundColor = greyDarkest
+        transactionsTable.tintColor = .white
+        transactionsTable.reloadData()
+    }
+    @objc func closeButtonAction() { view.endEditing(true) }
+    @objc func dateChanged(datePkr: UIDatePicker) {
+        dateField.text = datePkr.date.toString()
+    }
+    @objc func respondToSwipeGesture(_ gesture: UIGestureRecognizer)  {
+        if let swipe = gesture as? UISwipeGestureRecognizer {
+            if swipe.direction == .up {
+                performSegue(withIdentifier: "EditTransactionsU", sender: nil)
+            } else {
+                fetchTxns(sortBy: "Date", asc: true)
+                let id = UserDefaults.standard.string(forKey: "LastDashboard")
+                performSegue(withIdentifier: (id ?? "Summary") + "D",
+                             sender: nil)
+            }
+        }
     }
     
+    //checking for missing categories must be done in "viewDidAppear(...)" because alerts cannot display in "viewDidLoad(...)"
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        screenHeight = Double(view.frame.height)
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300), execute: {
-            checkForMissingCategories(self)
-        })
+        //check for missing categories only if the user has already synced with their data store post-login
+        let dbFetched = UserDefaults.standard.bool(forKey: "FirebaseFetched")
+        if dbFetched {  checkCtgMissing(self) }
     }
     
+    //close open input views if touch occurs outside of input view or user hits "Return"
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         view.endEditing(true)
         super.touchesBegan(touches, with: event)
@@ -84,271 +150,313 @@ class VCNewTransaction: UIViewController, UITextFieldDelegate {
         view.endEditing(true)
         return false
     }
-    
-    @objc func respondToSwipeGesture(_ gesture: UIGestureRecognizer)  {
-        if let swipeGesture = gesture as? UISwipeGestureRecognizer {
-            performSegue(withIdentifier: swipeGesture.direction == .up ? "EditTransactionsU" : (UserDefaults.standard.string(forKey: "LastDashboard") ?? "Summary") + "D", sender: nil)
-        }
-    }
-    
-    func createDatePicker() {
-        datePicker.addTarget(self, action: #selector(dateChanged(datePicker:)), for: .valueChanged)
-        datePicker.backgroundColor = greyDarkest
-        datePicker.datePickerMode = .date
-        var dateComponents = DateComponents()
-        dateComponents.year = -1
-        datePicker.minimumDate = min(Calendar.current.date(byAdding: dateComponents, to: Date())!, (UserDefaults.standard.string(forKey: "StartDate")?.toDate() ?? Date()))
-        datePicker.setValue(UIColor.white, forKey: "textColor")
-        
-    }
-    @objc func dateChanged(datePicker: UIDatePicker) { dateField.text = datePicker.date.toString() }
-    
-    func createToolbars(_ fields: [DesignableTextField]) {
-        let toolbar: UIToolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 0))
-        let closeButton: UIBarButtonItem = UIBarButtonItem(title: "Close", style: .plain, target: self, action: #selector(closeButtonAction))
-        toolbar.barStyle = .default
-        toolbar.barTintColor = greyDarkest
-        toolbar.setItems([closeButton], animated: true)
-        toolbar.sizeToFit()
-        toolbar.tintColor = .white
-        for field in fields {
-            field.delegate = self
-            field.inputAccessoryView = toolbar
-            field.tintColor = .white
-        }
-    }
-    @objc func closeButtonAction() { view.endEditing(true) }
-    
+
+    //immediately after login, pull existing Transactions and Categories from user's data store
     func firebasePull() {
+        //disable inputs while data is loading
         activityIndicatorView.isHidden = false
         view.isUserInteractionEnabled = false
-        firebaseReference!.child("Categories").observeSingleEvent(of: .value, with: { snapshot in
-            var empty = true
-            if snapshot.exists() {
-                for obj in snapshot.children.allObjects as! [DataSnapshot] {
+        
+        //based on the structure of the data store, loop through all children of all Categories and, depending on which item in the Category object is being read ("i"), set that to a value ("val") as a specific data type to build Categories ("ctg") to add to "ctgs"
+        dbr?.child("Categories").observeSingleEvent(of: .value, with: { snap in
+            if snap.exists() {
+                for obj in snap.children.allObjects as! [DataSnapshot] {
                     var i = 0
-                    let category = Category(context: PersistenceService.context)
-                    for data in obj.children.allObjects as! [DataSnapshot] {
+                    let ctg = Category(context: PersistenceService.context)
+                    for obj in obj.children.allObjects as! [DataSnapshot] {
                         switch i {
-                        case 0: if let val = data.value as? Double { category.budget     = val }
-                        case 1: if let val = data.value as? Double { category.proportion = val }
-                        case 2:                                      category.selected   = false
-                        case 3: if let val = data.value as? Bool   { category.sign       = val }
-                        case 4: if let val = data.value as? String { category.title      = val }
+                        case 0:
+                            if let val = obj.value as? Double {
+                                ctg.budget = val
+                            }
+                        case 1:
+                            if let val = obj.value as? Double {
+                                ctg.proportion = val
+                            }
+                        case 2: ctg.selected = false
+                        case 3: ctg.sign = true
+                        case 4:
+                            if let val = obj.value as? String {
+                                ctg.title = val
+                            }
                         default: break
                         }
                         i += 1
                     }
-                    empty = false
-                    categories.append(category)
-                    PersistenceService.saveContext()
-                    UserDefaults.standard.set(UserDefaults.standard.double(forKey: "Budget") + category.budget, forKey: "Budget")
+                    ctgs.append(ctg)
+                    let bdg = UserDefaults.standard.double(forKey: "Budget")
+                    UserDefaults.standard.set(bdg + ctg.budget,
+                                              forKey: "Budget")
                 }
             }
-            if empty { createDefaultCategories() }
-            firebaseReference!.child("Transactions").observeSingleEvent(of: .value, with: { snapshot in
-                if snapshot.exists() {
-                    for obj in snapshot.children.allObjects as! [DataSnapshot] {
+            
+            //once all Categories have finished being pulled, start pulling Transactions
+            let key = dbr?.child("Transactions")
+            key?.observeSingleEvent(of: .value, with: { snap in
+                if snap.exists() {
+                    for obj in snap.children.allObjects as! [DataSnapshot] {
                         var i = 0
-                        let transaction = Transaction(context: PersistenceService.context)
-                        for data in obj.children.allObjects as! [DataSnapshot] {
+                        let txn =
+                            Transaction(context: PersistenceService.context)
+                        for obj in obj.children.allObjects as! [DataSnapshot] {
                             switch i {
-                            case 0: if let val = data.value as? Double { transaction.amount   = val          }
-                            case 1: if let val = data.value as? String { transaction.category = val          }
-                            case 2: if let val = data.value as? String { transaction.date     = val.toDate() }
-                            case 3: if let val = data.value as? Int    { transaction.index    = Int32(val)   }
-                            case 4:                                      transaction.selected = false
-                            case 5: if let val = data.value as? Bool   { transaction.sign     = val          }
-                            case 6: if let val = data.value as? String { transaction.title    = val          }
+                            case 0:
+                                if let val = obj.value as? Double {
+                                    txn.amount = val
+                                }
+                            case 1:
+                                if let val = obj.value as? String {
+                                    txn.category = val
+                                }
+                            case 2:
+                                if let val = obj.value as? String {
+                                    txn.date = val.toDate()
+                                }
+                            case 3:
+                                if let val = obj.value as? Int {
+                                    txn.index = Int32(val)
+                                }
+                            case 4: txn.selected = false
+                            case 5:
+                                if let val = obj.value as? Bool {
+                                    txn.sign = val
+                                }
+                            case 6:
+                                if let val = obj.value as? String {
+                                    txn.title = val
+                                }
                             default: break
                             }
                             i += 1
                         }
-                        transactions.append(transaction)
+                        txns.append(txn)
                     }
-                    PersistenceService.saveContext()
                 }
+                
+                //fetch Transactions in order to sort them properly and check to make sure no Categories are missing
+                fetchCtgs()
+                if ctgs.count == 0 { setDefaultCtgs() }
+                fetchTxns(sortBy: "Date", asc: false)
+                checkCtgMissing(self)
+                self.transactionsTable.reloadData()
+                
+                //mark "FirebaseFetched" as true once all pulls have completed and return control to the user
                 UserDefaults.standard.set(true, forKey: "FirebaseFetched")
-                fetchTransactions(sortBy: "Date", ascending: false)
-                self.refreshTransactionsTable()
                 self.activityIndicatorView.isHidden = true
                 self.view.isUserInteractionEnabled = true
-                checkForMissingCategories(self)
             })
         })
     }
     
-    func refreshTransactionsTable() {
-        transactionsTable.backgroundColor = greyDarkest
-        transactionsTable.tintColor = .white
-        transactionsTable.reloadData()
-    }
-    
-    func highlightAddButton(_ color: UIColor) {
-        addToLedgerButton.backgroundColor = color == greyDarker ? greyDark : color
-        addToLedgerButton.borderColor = color
-        entriesOutlineView.borderColor = color
-    }
-    
-    @IBAction func editTitleField(_ sender: DesignableTextField) {
-        sender.attributedPlaceholder = NSAttributedString(string: "")
-        titleField.attributedPlaceholder = NSAttributedString(string: "Short description", attributes: [NSAttributedString.Key.foregroundColor: greyDark])
-        sender.font = UIFont(name: "Menlo", size: 20)
-        if sender.text == "(no description)" { sender.text = "" }
-    }
-    
-    //not sure if i need this
-    @IBAction func endEditTitleField(_ sender: DesignableTextField) {
-        //        if sender.text == "" {
-        //            titleField.attributedPlaceholder = NSAttributedString(string: "Short description", attributes: [NSAttributedString.Key.foregroundColor: greyDark])
-        //            titleField.font = UIFont(name: "Menlo", size: 20)
-        //        }
-    }
-    
-    @IBAction func editMoneyField(_ sender: DesignableTextField) {
-        sender.backgroundColor = greyDarkest
-        sender.text = sender.text?.currencyFormat()
-        sender.font = UIFont(name: "Menlo", size: 20)
-        highlightAddButton((sender.text != "" && categoryField.text != "") ? teal : greyDarker)
-    }
-    
+    //handle when user taps "addToLedgerButton"
     @IBAction func tapAddTransaction(_ sender: DesignableButton) {
+        //close all open input views
         view.endEditing(true)
+        
+        //if "titleField" is blank, auto-populate it; this field is not required
         if titleField.text == "" { titleField.text = "(no description)" }
-        if amountField.text == "" || categoryField.text == "" {
-            amountField.backgroundColor =   amountField.text ==   "" ? red : greyDarkest
-            categoryField.backgroundColor = categoryField.text == "" ? red : greyDarkest
-        } else {
-            UserDefaults.standard.set(1 + (UserDefaults.standard.object(forKey: "TransactionIndex") != nil ? Int(UserDefaults.standard.integer(forKey: "TransactionIndex")) : Int(transactions.max(by: { $0.index < $1.index })?.index ?? 0)), forKey: "TransactionIndex")
-            let transaction = Transaction(context: PersistenceService.context)
-            transaction.amount = (positive ? 1 : -1) * Double(String(amountField.text!.suffix(amountField.text!.count - 1)).replacingOccurrences(of: ",", with: "", options: String.CompareOptions.literal, range: nil))!
-            transaction.category = categoryField.text!
-            transaction.date = dateField.text!.toDate()
-            transaction.index = Int32(UserDefaults.standard.integer(forKey: "TransactionIndex"))
-            transaction.selected = false
-            transaction.sign = positive
-            transaction.title = titleField.text ?? "(no description)"
-            transactions.insert(transaction, at: 0)
-            if (UserDefaults.standard.string(forKey: "StartDate") ?? Date().toString()).toDate() > transaction.date { UserDefaults.standard.set(transaction.date.toString(), forKey: "StartDate") }
+        
+        //if a required field is empty, highlight it red
+        let amt = amountField.text ?? ""
+        let ctg = categoryField.text ?? ""
+        if amt == "" || ctg == "" {
+            amountField.backgroundColor   = amt == "" ? red : greyDarkest
+            categoryField.backgroundColor = ctg == "" ? red : greyDarkest
+        }
+        //if no required fields are empty, add the supplied details as a Transaction to "txns"
+        else {
+            let txn = Transaction(context: PersistenceService.context)
+            
+            //the formatting elements of "amountField" must be removed before it can be formatted as a and saved as a Double
+            let amtStr = String(amt.suffix(amt.count - 1))
+            let amtVal = Double(amtStr.replacingOccurrences(
+                of: ",", with: "", options: .literal, range: nil))
+            txn.amount = (revenue ? 1 : -1) * (amtVal ?? 0)
+            txn.sign = revenue
+            
+            //index should be one higher than the highest already in "txns"
+            let maxIndex = txns.max(by: { $0.index < $1.index })?.index ?? 0
+            txn.index = Int32(1) + maxIndex
+            
+            txn.category = categoryField.text ?? ctgs.first?.title ?? ""
+            txn.date = (dateField.text ?? Date().toString()).toDate()
+            txn.title = titleField.text ?? "(no description)"
+            txn.selected = false
+            
+            //once all elements of "txn" are populated, put it at the start of "txns" even if it's not chronologically appropriate so that it appears at the top of "transactionsTable" and provides feedback to the user
+            txns.insert(txn, at: 0)
             PersistenceService.saveContext()
             transactionsTable.reloadData()
-            let updates: [AnyHashable: Any] = [
-                "Amount":   transaction.amount,
-                "Category": transaction.category,
-                "Date":     transaction.date.toString(),
-                "Index":    transaction.index,
-                "Selected": transaction.selected,
-                "Sign":     transaction.sign,
-                "Title":    transaction.title
-            ]
-            if firebaseReference != nil {
-                firebaseReference!.child("Transactions").child(String(format: "Transaction%06d", transaction.index)).updateChildValues(updates)
-                firebaseUpdateCounters()
-            }
             
+            //save the details of "txn" to a Hashable to updated the user's data store and update the store's counters
+            let upd: [AnyHashable: Any] = [
+                "Amount":   txn.amount,
+                "Category": txn.category,
+                "Date":     txn.date.toString(),
+                "Index":    txn.index,
+                "Selected": txn.selected,
+                "Sign":     txn.sign,
+                "Title":    txn.title
+            ]
+            let chl = String(format: "Transaction%06d", txn.index)
+            dbr?.child("Transactions").child(chl).updateChildValues(upd)
+            firebasePushTxns()
+            
+            //reset the text fields and unhighlight "addToLedgerButton"
             amountField.backgroundColor = greyDarkest
-            amountField.text = ""
             categoryField.backgroundColor = greyDarkest
+            amountField.text = ""
             categoryField.text = ""
             titleField.text = ""
-            highlightAddButton(greyDarker)
+            highlightAddButton()
+        }
+    }
+
+    //highlight "addToLedgerButton" "teal" if required fields have been completed
+    func highlightAddButton() {
+        if amountField.text == "" || categoryField.text == "" {
+            addToLedgerButton.backgroundColor = greyDark
+            addToLedgerButton.borderColor = greyDarker
+            entriesOutlineView.borderColor = greyDarker
+        } else {
+            addToLedgerButton.backgroundColor = teal
+            addToLedgerButton.borderColor = teal
+            entriesOutlineView.borderColor = teal
         }
     }
     
-    @IBAction func tapDashboards(_ sender: UIButton) {
-        var categoryMissing = false
-        for transaction in transactions {
-            if categories.first(where: { $0.title == transaction.category } ) == nil {
-                categoryMissing = true
-                break
-            }
-        }
-        if categoryMissing { checkForMissingCategories(self) }
-        else { performSegue(withIdentifier: (UserDefaults.standard.string(forKey: "LastDashboard") ?? "Summary") + "D", sender: nil) }
-    }
-    
+    //change which button is highlighted, "expenseButton" or "revenueButton"
     @IBAction func tapSign(_ sender: DesignableButton) {
-        switch positive {
-        case true:
-            positive = false
-            expenseButton.borderColor = red
-            expenseButton.setTitleColor(.white, for: .normal)
-            revenueButton.borderColor = greyLighter
-            revenueButton.setTitleColor(greyLighter, for: .normal)
-        case false:
-            positive = true
+        revenue = !revenue
+        if revenue {
             expenseButton.borderColor = greyLighter
             expenseButton.setTitleColor(greyLighter, for: .normal)
             revenueButton.borderColor = teal
             revenueButton.setTitleColor(.white, for: .normal)
+        } else {
+            expenseButton.borderColor = red
+            expenseButton.setTitleColor(.white, for: .normal)
+            revenueButton.borderColor = greyLighter
+            revenueButton.setTitleColor(greyLighter, for: .normal)
         }
+    }
+    
+    //format inputs as currency and check if "addToLedgerButton" can be highlighted
+    @IBAction func editMoneyField(_ sender: DesignableTextField) {
+        sender.backgroundColor = greyDarkest
+        sender.text = sender.text?.currencyFormat()
+        highlightAddButton()
+    }
+    
+    //remove the placeholder text that is auto-populated if a user tries to add a transaction without "titleField" populated
+    @IBAction func editTitleField(_ sender: DesignableTextField) {
+        if sender.text == "(no description)" { sender.text = "" }
+    }
+    
+    //fetch categories sorted by date for use in "Dashboards" and segue to the last "Dashboard" visited by the user
+    @IBAction func tapDashboards(_ sender: UIButton) {
+        fetchTxns(sortBy: "Date", asc: true)
+        let dsh = UserDefaults.standard.string(forKey: "LastDashboard")
+        performSegue(withIdentifier: (dsh ?? "Summary") + "D", sender: nil)
     }
 }
 
+//mostly just formatting for "transactionsTable"
 extension VCNewTransaction: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { return transactions.count }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int)
+        -> Int
+        { return txns.count }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
-        cell.backgroundColor = .clear
-        cell.textLabel?.textColor = .white
-        cell.textLabel?.font = UIFont(name: "Metropolis-ExtraBold", size: 17)
-        cell.detailTextLabel?.textColor = offWhite
-        cell.detailTextLabel?.font = UIFont(name: "Metropolis-Regular", size: 14)
-        cell.textLabel?.text = (transactions[indexPath.row].sign ? "+" : "-") + String(format:"%.02f", abs(transactions[indexPath.row].amount)).currencyFormat() + " for " + String(transactions[indexPath.row].category)
-        cell.detailTextLabel?.text = "#" + String(transactions[indexPath.row].index) + ": " + transactions[indexPath.row].title + " on " + transactions[indexPath.row].date.toString()
-        return cell
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath)
+        -> UITableViewCell
+    {
+        let c = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
+        c.backgroundColor = .clear
+        c.textLabel?.textColor = .white
+        c.textLabel?.font = UIFont(name: "Metropolis-ExtraBold", size: 17)
+        c.detailTextLabel?.textColor = offWhite
+        c.detailTextLabel?.font = UIFont(name: "Metropolis-Regular", size: 14)
+        
+        let sign = txns[indexPath.row].sign ? "+" : "-"
+        let amt = String(format:"%.02f", abs(txns[indexPath.row].amount))
+        let ctg = String(txns[indexPath.row].category)
+        c.textLabel?.text = sign + amt.currencyFormat() + " for " + ctg
+        
+        let idx = String(txns[indexPath.row].index)
+        let ttl = txns[indexPath.row].title
+        let date = txns[indexPath.row].date.toString()
+        c.detailTextLabel?.text = "#" + idx + ": " + ttl + " on " + date
+        
+        return c
     }
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+
+    //enable users to swipe left on a cell to delete the association Transaction
+    func tableView(_ tableView: UITableView,
+                   commit editingStyle: UITableViewCell.EditingStyle,
+                   forRowAt indexPath: IndexPath)
+    {
         if editingStyle == .delete {
-            firebaseReference?.child("Transactions").child(String(format: "Transaction%06d", transactions[indexPath.row].index)).removeValue()
-            PersistenceService.context.delete(transactions[indexPath.row])
-            transactions.remove(at: indexPath.row)
+            let c = String(format: "Transaction%06d", txns[indexPath.row].index)
+            dbr?.child("Transactions").child(c).removeValue()
+            PersistenceService.context.delete(txns[indexPath.row])
+            txns.remove(at: indexPath.row)
             PersistenceService.saveContext()
             tableView.beginUpdates()
             tableView.deleteRows(at: [indexPath], with: .automatic)
             tableView.endUpdates()
-            if firebaseReference != nil { firebaseUpdateCounters() }
+            firebasePushTxns()
         }
     }
-    
-    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        let deleteButton = UITableViewRowAction(style: .default, title: "Delete") { (action, indexPath) in
-            tableView.dataSource?.tableView!(tableView, commit: .delete, forRowAt: indexPath)
-            return
+
+    func tableView(_ tableView: UITableView, editActionsForRowAt
+        indexPath: IndexPath) -> [UITableViewRowAction]?
+    {
+        let deleteButton =
+            UITableViewRowAction(style: .default, title: "Delete") {
+                (action, indexPath) in
+                    tableView.dataSource?.tableView?(tableView,
+                                                     commit: .delete,
+                                                     forRowAt: indexPath)
+                    return
         }
         deleteButton.backgroundColor = red
         return [deleteButton]
     }
 }
 
+//mostly just formatting for "categoryField"'s input picker view
 extension VCNewTransaction: UIPickerViewDataSource, UIPickerViewDelegate {
     func numberOfComponents(in pickerView: UIPickerView) -> Int { return 1 }
     
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    //when the user taps "categoryField", set the default value of "categoryField" to the first Category available in the picker view, check to see if "addToLedgerButton" can be highlighted, and remove the red background from "categoryField" that may exist if the user tapped "addToLedgerButton" before completing "categoryField"
+    func pickerView(_ pickerView: UIPickerView,
+                    numberOfRowsInComponent component: Int) -> Int
+    {
         pickerView.backgroundColor = greyDarkest
         categoryField.backgroundColor = greyDarkest
-        categoryField.font = UIFont(name: "Menlo", size: 20)
-        if categoryField.text == "" { categoryField.text = categories[lastCategoryPicked].title }
-        if amountField.text != "" { highlightAddButton(teal) }
-        return categories.count
+        if categoryField.text == "" { categoryField.text = ctgs.first?.title }
+        highlightAddButton()
+        return ctgs.count
     }
     
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? { return categories[row].title }
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int,
+                    forComponent component: Int) -> String?
+        { return ctgs[row].title }
     
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        categoryField.text = categories[row].title
-        lastCategoryPicked = row
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int,
+                    inComponent component: Int)
+        { categoryField.text = ctgs[row].title }
+
+    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int,
+        forComponent component: Int, reusing view: UIView?) -> UIView
+    {
         let label = UILabel()
         label.backgroundColor = greyDarkest
         label.font = UIFont(name: "Menlo", size: 25)
         label.textAlignment = .center
         label.textColor = .white
-        label.text = categories[row].title
+        label.text = ctgs[row].title
         return label
     }
 }
+////////10////////20////////30////////40////////50////////60////////70////////80

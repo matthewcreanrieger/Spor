@@ -1,4 +1,5 @@
-//WORK IN PROGRESS
+//COMMENTING IN PROGRESS
+////////10////////20////////30////////40////////50////////60////////70////////80
 import UIKit
 
 public protocol ChartDelegate: class {
@@ -385,7 +386,7 @@ open class ChartSeries {
     open var line = true
     open var area = false
     open var color = teal { didSet { colors = (above: color, below: color, 0) } }
-    open var colors = (above: teal, below: red, zeroLevel: 0.0)
+    open var colors = (above: red, below: teal, zeroLevel: 0.0)
     
     public init(_ data: [Double]) {
         self.data = []
@@ -398,3 +399,4 @@ open class ChartSeries {
     public init(data: [(x: Int,    y: Double)]) { self.data = data.map { (Double($0.x), Double($0.y)) } }
     public init(data: [(x: Float,  y: Float )]) { self.data = data.map { (Double($0.x), Double($0.y)) } }
 }
+////////10////////20////////30////////40////////50////////60////////70////////80

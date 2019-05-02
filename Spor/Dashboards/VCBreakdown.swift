@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+////////10////////20////////30////////40////////50////////60////////70////////80
 import UIKit
 
 //"VCBreakdown" displays four columns that contain the following pieces of information:
@@ -23,8 +23,6 @@ class VCBreakdown: UIViewController {
         
         UserDefaults.standard.set(title, forKey: "LastScreen")
         UserDefaults.standard.set(title, forKey: "LastDashboard")
-        
-        fetchTransactions(sortBy: "Date", ascending: true)
 
         //"HeaderC" and "HeaderD" are configured pre-"viewDidAppear(...)" so that their updates are less obvious
         let currency = UserDefaults.standard.string(forKey: "Currency") ?? "$"
@@ -84,16 +82,16 @@ class VCBreakdown: UIViewController {
         //"labelHeight" is the height of each individual label in "columnA" - "columnD" based on the total amount of vertical space allocated to "columnA" - "columnD"
         //the "0.58" is hard-coded based on constraints that were set in the Storyboard, which should probably be optimized in the future
         //if there are too few categories, "labelHeight" becomes too large and 1/20th of the screen height is used instead
-        let lblHT = min(view.frame.height * 0.58 / CGFloat(categories.count),
+        let lblHT = min(view.frame.height * 0.58 / CGFloat(ctgs.count),
                         view.frame.height * 0.05)
 
         //for each category, "columnA" - "columnD" is populated with an index, a value used for sorting, and a UILabel that can be added to "view.subviews" dynamically
-        for i in 0..<categories.count {
-            let cumulBudg = daysSinceStart * categories[i].budget / budgDiv
+        for i in 0..<ctgs.count {
+            let cumulBudg = daysSinceStart * ctgs[i].budget / budgDiv
             var cumulSpend = 0.0
-            for tra in transactions {
-                if tra.date <= now && tra.category == categories[i].title {
-                    cumulSpend -= tra.amount
+            for txn in txns {
+                if txn.date <= now && txn.category == ctgs[i].title {
+                    cumulSpend -= txn.amount
                 } else { break }
             }
             
@@ -123,7 +121,7 @@ class VCBreakdown: UIViewController {
                     columnA.append((i, Double(i), label))
                 //category title
                 case HeaderB:
-                    label.text = categories[i].title
+                    label.text = ctgs[i].title
                     columnB.append((i, Double(i), label))
                 //current amount over/under budget for that category
                 case HeaderC:
@@ -201,4 +199,4 @@ class VCBreakdown: UIViewController {
         for label in breakdownLabels { view.addSubview(label) }
     }
 }
-////////////////////////////////////////////////////////////////////////////////
+////////10////////20////////30////////40////////50////////60////////70////////80

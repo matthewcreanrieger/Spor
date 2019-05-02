@@ -1,4 +1,5 @@
-//WORK IN PROGRESS
+//COMMENTING IN PROGRESS
+////////10////////20////////30////////40////////50////////60////////70////////80
 import UIKit
 
 @IBDesignable open class PieChart: UIView {
@@ -6,7 +7,7 @@ import UIKit
     @IBInspectable public var outerRadius = CGFloat(90)
     @IBInspectable public var strokeColor = UIColor.black
     @IBInspectable public var strokeWidth = CGFloat(0)
-    @IBInspectable public var selectedOffset = CGFloat(screenHeight * 0.03)
+    @IBInspectable public var selectedOffset = UIScreen.main.bounds.height * 0.03
     @IBInspectable public var animDuration = 0.5
     @IBInspectable public var referenceAngle = CGFloat(240) {
         didSet {
@@ -229,3 +230,4 @@ public class PieChartLabelSettings {
     public var bgColor: UIColor = UIColor.clear
     public var font: UIFont = UIFont.boldSystemFont(ofSize: 15)
 }
+////////10////////20////////30////////40////////50////////60////////70////////80

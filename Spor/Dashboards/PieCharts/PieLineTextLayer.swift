@@ -1,4 +1,5 @@
-//WORK IN PROGRESS
+//COMMENTING IN PROGRESS
+////////10////////20////////30////////40////////50////////60////////70////////80
 import UIKit
 
 public struct PieLineTextLayerSettings {
@@ -106,3 +107,4 @@ public struct AlphaPieLineTextLayerAnimator: PieLineTextLayerAnimator {
         UIView.animate(withDuration: duration) { label.alpha = 1 }
     }
 }
+////////10////////20////////30////////40////////50////////60////////70////////80

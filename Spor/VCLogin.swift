@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+////////10////////20////////30////////40////////50////////60////////70////////80
 import UIKit
 import CoreData
 import Firebase
@@ -67,6 +67,12 @@ class VCLogin: UIViewController, UITextFieldDelegate {
         }
     }
     @objc func buttonAction() { view.endEditing(true) }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        //prevents bug where a UITextView initially displays the middle of its content rather than the beginning
+        tc.scrollRangeToVisible(NSRange(location:0, length:0))
+    }
     
     //switch which authentication method is highlighted, "Sign Up" or "Sign In", and hide/reveal all appropriate input items
     @IBAction func tapAuthenticationType(_ sender: DesignableButton) {
@@ -206,7 +212,8 @@ class VCLogin: UIViewController, UITextFieldDelegate {
     @IBAction func tapAskNever(_ sender: DesignableButton) {
         let alert = UIAlertController(
             title: "Are you sure you want to always skip the Login screen?",
-            message: "Note: If you never create an account, all of your data will be lost in the event your device is restored or replaced.",
+            message: "Note: If you never create an account, all of your data " +
+            "will be lost in the event your device is restored or replaced.",
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(
@@ -354,7 +361,10 @@ class VCLogin: UIViewController, UITextFieldDelegate {
             self.displayActivityIndicator(false)
             let alert = UIAlertController(
                 title: "Email Not Validated",
-                message: "Click the link that was sent to " + self.username + " to verify this email. Then, tap \"Continue\" to finish the sign up process.\n\nNote: It may take a few minutes for the email to appear in your inbox!",
+                message: "Click the link that was sent to " + self.username +
+                    " to verify this email. Then, tap \"Continue\" to finish " +
+                    "the sign up process.\n\nNote: It may take a few minutes " +
+                    "for the email to appear in your inbox!",
                 preferredStyle: .alert
             )
             alert.addAction(UIAlertAction(
@@ -411,15 +421,31 @@ class VCLogin: UIViewController, UITextFieldDelegate {
         
         if let errorCode = AuthErrorCode(rawValue: error._code) {
             switch errorCode {
-            case .emailAlreadyInUse: return "This email address is already in use. Would you like to try signing in with these credentials instead?"
-            case .missingEmail:      return "Please supply an email address."
-            case .userDisabled:      return "This account has been disabled."
-            case .invalidEmail:      return "The email address provided is not valid."
-            case .userNotFound:      return "The username provided is not associated with an account."
-            case .tooManyRequests:   return "An unusual number of login attempts have been made from this device. Please wait 60 seconds and try again."
-            case .weakPassword:      return "The password entered is too weak. Please try making a longer password with more capital letters, special characters, and/or numbers."
-            case .wrongPassword:     return "The password provided is incorrect."
-            default:                 return "Either you are not connected to the Internet or Spor's servers are down! Please try again later."
+            case .emailAlreadyInUse:
+                return "This email address is already in use. Would you like " +
+                    "to try signing in with these credentials instead?"
+            case .missingEmail:
+                return "Please supply an email address."
+            case .userDisabled:
+                return "This account has been disabled."
+            case .invalidEmail:
+                return "The email address provided is not valid."
+            case .userNotFound:
+                return "The username provided is not associated with an " +
+                    "account."
+            case .tooManyRequests:
+                return "An unusual number of login attempts have been " +
+                    "made from this device. Please wait 60 seconds and try " +
+                    "again."
+            case .weakPassword:
+                return "The password entered is too weak. Please try making " +
+                    "a longer password with more capital letters, special " +
+                    "characters, and/or numbers."
+            case .wrongPassword:
+                return "The password provided is incorrect."
+            default:
+                return "Either you are not connected to the Internet or " +
+                    "Spor's servers are down! Please try again later."
             }
         } else { return "An unkown error occured." }
     }
@@ -429,36 +455,34 @@ class VCLogin: UIViewController, UITextFieldDelegate {
         UserDefaults.standard.set(userID, forKey: "UserID")
         
         //fetch any existing transactions and categories that were entered while signed out
-        let catFetch: NSFetchRequest<Category>    = Category   .fetchRequest()
-        let traFetch: NSFetchRequest<Transaction> = Transaction.fetchRequest()
-        catFetch.sortDescriptors = [
+        let ctgFR: NSFetchRequest<Category>    = Category   .fetchRequest()
+        let txnFR: NSFetchRequest<Transaction> = Transaction.fetchRequest()
+        ctgFR.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(Category.title),    ascending: true)
         ]
-        traFetch.sortDescriptors = [
+        txnFR.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(Transaction.index), ascending: false)
         ]
-        do { categories   = try PersistenceService.context.fetch(catFetch) }
-        catch {}
-        do { transactions = try PersistenceService.context.fetch(traFetch) }
-        catch {}
+        do { ctgs = try PersistenceService.context.fetch(ctgFR) } catch {}
+        do { txns = try PersistenceService.context.fetch(txnFR) } catch {}
 
         //if any transactions were created offline, prompt the user with the option to merge these offline transactions with what is online
         //otherwise, finish the segue to the "NewTransaction" View Controller
-        if transactions.count > 0 {
-            let parent = Database.database().reference().child(userID)
-            let refCnt = parent.child("TransactionCounters").child("Count")
-            let refMax = parent.child("TransactionCounters").child("MaxIndex")
-            refCnt.observeSingleEvent(of: .value, with: { snapshot in
-                if let cnt = snapshot.value as? Int {
-                    refMax.observeSingleEvent(of: .value, with: { snapshot in
-                        if let max = snapshot.value as? Int {
-                            self.askToKeepExistingTransactions(parent, cnt, max)
+        if txns.count > 0 {
+            let key = Database.database().reference().child(userID)
+            let ctRef = key.child("TransactionCounters").child("Count")
+            let miRef = key.child("TransactionCounters").child("MaxIndex")
+            ctRef.observeSingleEvent(of: .value, with: { snap in
+                if let ct = snap.value as? Int {
+                    miRef.observeSingleEvent(of: .value, with: { snap in
+                        if let mi = snap.value as? Int {
+                            self.askToKeepExistingTransactions(key, ct, mi)
                         }
                         else {
-                            self.askToKeepExistingTransactions(parent, cnt, 0)
+                            self.askToKeepExistingTransactions(key, ct, 0)
                         }
                     })
-                } else { self.askToKeepExistingTransactions(parent, 0, 0) }
+                } else { self.askToKeepExistingTransactions(key, 0, 0) }
             })
         } else { self.completeSegue() }
     }
@@ -471,10 +495,10 @@ class VCLogin: UIViewController, UITextFieldDelegate {
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         let amount = numberFormatter.string(
-            from: NSNumber(value: transactions.count)) ?? "An unknown number of"
+            from: NSNumber(value: txns.count)) ?? "An unknown number of"
         
         //booleans are included in "message" to make the prompt grammatically correct for either just 1 transaction or more than 1 transaction
-        let plural = transactions.count > 1
+        let plural = txns.count > 1
         let alert = UIAlertController(
             title: "Keep Existing Transactions?",
             message:
@@ -500,25 +524,25 @@ class VCLogin: UIViewController, UITextFieldDelegate {
             style: .cancel,
             handler: { action in
                 var maxIndex = 0
-                for i in 0..<transactions.count {
+                for i in 0..<txns.count {
                     //reassign the indexes of each offline transaction to the max Firebase transaction index plus one plus the number of offline transactions already added, defined as "maxIndex"
                     //this "maxIndex" value is also used to determine the ID for each Transaction in the Firebase database (Transaction######)
                     maxIndex = firebaseMaxIndex + 1 + i
                     let updates: [AnyHashable: Any] = [
-                        "Amount":   transactions[i].amount,
-                        "Category": transactions[i].category,
-                        "Date":     transactions[i].date.toString(),
+                        "Amount":   txns[i].amount,
+                        "Category": txns[i].category,
+                        "Date":     txns[i].date.toString(),
                         "Index":    Int32(maxIndex),
                         "Selected": false,
-                        "Sign":     transactions[i].sign,
-                        "Title":    transactions[i].title
+                        "Sign":     txns[i].sign,
+                        "Title":    txns[i].title
                     ]
                     let child = String(format: "Transaction%06d", maxIndex)
                     parent.child("Transactions")
                         .child(child).updateChildValues(updates)
                 }
                 let updates: [AnyHashable: Any] = [
-                    "Count": firebaseCount + transactions.count,
+                    "Count": firebaseCount + txns.count,
                     "MaxIndex": maxIndex
                 ]
                 parent.child("TransactionCounters").updateChildValues(updates)
@@ -534,10 +558,10 @@ class VCLogin: UIViewController, UITextFieldDelegate {
         displayActivityIndicator(true)
         
         //delete all local categories, transactions, and user preferences because these will be refreshed using the user's Firebase data
-        for i in categories   { PersistenceService.context.delete(i) }
-        for i in transactions { PersistenceService.context.delete(i) }
-        categories =   []
-        transactions = []
+        for ctg in ctgs { PersistenceService.context.delete(ctg) }
+        for txn in txns { PersistenceService.context.delete(txn) }
+        ctgs = []
+        txns = []
         PersistenceService.saveContext()
         
         //used to display who is signed in in the "Settings" View Controller
@@ -547,8 +571,6 @@ class VCLogin: UIViewController, UITextFieldDelegate {
         UserDefaults.standard.removeObject(forKey: "Budget")
         UserDefaults.standard.removeObject(forKey: "Period")
         UserDefaults.standard.removeObject(forKey: "FirebaseFetched")
-        UserDefaults.standard.removeObject(forKey: "TransactionIndex")
-        UserDefaults.standard.removeObject(forKey: "LastDashboard")
         
         //skip the login workflow for all future app launches until the user signs out
         UserDefaults.standard.set(true, forKey: "SkipLogin")
@@ -572,4 +594,4 @@ class VCLogin: UIViewController, UITextFieldDelegate {
         return false
     }
 }
-////////////////////////////////////////////////////////////////////////////////
+////////10////////20////////30////////40////////50////////60////////70////////80

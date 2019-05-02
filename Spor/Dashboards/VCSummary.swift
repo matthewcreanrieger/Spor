@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+////////10////////20////////30////////40////////50////////60////////70////////80
 import UIKit
 
 class VCSummary: UIViewController {
@@ -20,12 +20,9 @@ class VCSummary: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //allows user to return to this screen after exiting "Settings"
         UserDefaults.standard.set(title, forKey: "LastScreen")
         //allows user to return to this screen after exiting "NewTransaction" or "EditTransactions"
         UserDefaults.standard.set(title, forKey: "LastDashboard")
-        
-        fetchTransactions(sortBy: "Date", ascending: true)
         
         let swipeL = UISwipeGestureRecognizer(
             target: self, action: #selector(respondToSwipeGesture(_:)))
@@ -87,8 +84,8 @@ class VCSummary: UIViewController {
         let cumulBudg = daysSinceStart * budgPerDay
         //calculate the total amount of all transactions on or before today
         var cumulSpend = 0.0
-        for tra in transactions {
-            if tra.date <= now { cumulSpend -= tra.amount }
+        for txn in txns {
+            if txn.date <= now { cumulSpend -= txn.amount }
             else { break }
         }
 
@@ -109,20 +106,20 @@ class VCSummary: UIViewController {
         var hour = floor((daysOverUnder - day) * 24)
         var minute = Int(((daysOverUnder - day) * 24 - hour) * 60)
 
-        //"catDiffsAmount" and "catDiffsPercent" are used to identify the category by which a user is most over or under budget and to display each amount over or under budget for that category
-        var catDiffsAmount = [Double]()
-        var catDiffsPercent = [Double]()
-        for cat in categories {
-            let cumulCatBudg = daysSinceStart * cat.budget / budgDiv
-            var cumulCatSpend = 0.0
-            for tra in transactions {
-                if tra.date <= now && tra.category == cat.title {
-                    cumulCatSpend -= tra.amount
+        //"ctgDiffsAmount" and "ctgDiffsPercent" are used to identify the category by which a user is most over or under budget and to display each amount over or under budget for that category
+        var ctgDiffsAmount = [Double]()
+        var ctgDiffsPercent = [Double]()
+        for ctg in ctgs {
+            let cumulCtgBudg = daysSinceStart * ctg.budget / budgDiv
+            var cumulCtgSpend = 0.0
+            for txn in txns {
+                if txn.date <= now && txn.category == ctg.title {
+                    cumulCtgSpend -= txn.amount
                 }
                 else { break }
             }
-            catDiffsAmount.append(cumulCatSpend - cumulCatBudg)
-            catDiffsPercent.append(cumulCatSpend / cumulCatBudg * 100 - 100)
+            ctgDiffsAmount.append(cumulCtgSpend - cumulCtgBudg)
+            ctgDiffsPercent.append(cumulCtgSpend / cumulCtgBudg * 100 - 100)
         }
 
         //after calculating all of the above variables, begin populating the ".text" and ".textColor" properties of the "Summary" labels based on whether or not the user is over or under budget
@@ -140,14 +137,14 @@ class VCSummary: UIViewController {
             overUnderLabel.textColor = red
             breakEvenLabel.textColor = red
 
-            //identify the index for the maximum value contained in "catDiffsAmount" and use this index to identify the category that the following labels should represent
-            let i = catDiffsAmount.index(of: catDiffsAmount.max() ?? 0) ?? 0
+            //identify the index for the maximum value contained in "ctgDiffsAmount" and use this index to identify the category that the following labels should represent
+            let i = ctgDiffsAmount.index(of: ctgDiffsAmount.max() ?? 0) ?? 0
             outstandingCategoryLabel.text = "The category most over budget is "
-                + categories[i].title + " by:"
+                + ctgs[i].title + " by:"
             outstandingCategoryAmountLabel.text = String(format: "%.02f",
-                catDiffsAmount[i]).currencyFormat()
+                ctgDiffsAmount[i]).currencyFormat()
             outstandingCategoryPercentLabel.text = String(format: "%.02f%%",
-                catDiffsPercent[i].isNaN ? 999999.99 : catDiffsPercent[i])
+                ctgDiffsPercent[i].isNaN ? 999999.99 : ctgDiffsPercent[i])
             
             //"minute" and "hour" are added to their respective "current" variables, then...
             //...if "minute" is greater than or equal to 60, 60 minutes need to be subtracted from "minute" and added as 1 hour to "hour"
@@ -177,14 +174,14 @@ class VCSummary: UIViewController {
             overUnderLabel.textColor = teal
             breakEvenLabel.textColor = teal
 
-            //".min" in "catDiffsAmount" is used instead of ".max"
-            let index = catDiffsAmount.index(of: catDiffsAmount.min() ?? 0) ?? 0
+            //".min" in "ctgDiffsAmount" is used instead of ".max"
+            let index = ctgDiffsAmount.index(of: ctgDiffsAmount.min() ?? 0) ?? 0
             outstandingCategoryLabel.text = "The category most under budget is "
-                + categories[index].title + " by:"
+                + ctgs[index].title + " by:"
             outstandingCategoryAmountLabel.text = String(format: "%.02f",
-                catDiffsAmount[index]).currencyFormat()
+                ctgDiffsAmount[index]).currencyFormat()
             outstandingCategoryPercentLabel.text = String(format: "%.02f%%",
-                catDiffsPercent[index].isNaN ? 100.0 : -catDiffsPercent[index])
+                ctgDiffsPercent[index].isNaN ? 100.0 : -ctgDiffsPercent[index])
             
             //day needs to be made negative because the date component of "breakEvenLabel" is determined using "byAdding" in "Calendar.current.date(...)"; there isn't just a String that is set to equal "day" like there is for "minute" and "hour"
             //"minute" and "hour" are subtracted from their respective "current" variables, then...
@@ -243,4 +240,4 @@ class VCSummary: UIViewController {
         cover.isHidden = true
     }
 }
-////////////////////////////////////////////////////////////////////////////////
+////////10////////20////////30////////40////////50////////60////////70////////80
