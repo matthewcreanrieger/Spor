@@ -102,7 +102,15 @@ class VCSummary: UIViewController {
         //"daysOverUnder" is a Double that represents the amount of days that a user is over or under budget
         //"abs" is used so that the individual components of "day", "hour", and "minute" over/under budget can be extracted using the "floor" function
         //"day", "hour", and "minute" are either added or subtracted from "currentHour" and "currentMinute" later in order to calculate the componenets that make up "breakEvenLabel"
-        let daysOverUnder = abs((cumulSpend - cumulBudg) / budgPerDay)
+        //if the user has no budget, daysOverUnder is set to 0.0 and all related labels are hidden
+        var daysOverUnder = 0.0
+        if budgPerDay == 0 {
+            spendNothingLabel.isHidden = true
+            breakEvenLabel.isHidden = true
+        } else {
+            daysOverUnder = abs((cumulSpend - cumulBudg) / budgPerDay).cap()
+        }
+        
         var day = floor(daysOverUnder)
         var hour = floor((daysOverUnder - day) * 24)
         var minute = Int(((daysOverUnder - day) * 24 - hour) * 60)
@@ -132,9 +140,14 @@ class VCSummary: UIViewController {
 
         //if the user is over budget...
         if cumulSpend > cumulBudg {
-            let pct1 = cumulBudg == 0 ?
-                999999.9 : cumulSpend / cumulBudg * 100 - 100
-            overUnderPercentLabel.text = pct1.twoDecimals() + "%"
+            if cumulBudg == 0 {
+                overUnderPercentLabel.text = "(n/a)%"
+            }
+            else {
+                let pct1 = cumulSpend / cumulBudg * 100 - 100
+                overUnderPercentLabel.text = pct1.twoDecimals() + "%"
+            }
+            
             overUnderLabel.text = "OVER"
             overUnderLabel.textColor = red
             breakEvenLabel.textColor = red
@@ -145,8 +158,13 @@ class VCSummary: UIViewController {
                 + ctgs[i].title + " by:"
             outstandingCategoryAmountLabel.text = String(format: "%.02f",
                 ctgDiffsAmount[i]).currencyFormat()
-            let pct2 = ctgDiffsPercent[i].isNaN ? 999999.99 : ctgDiffsPercent[i]
-            outstandingCategoryPercentLabel.text = pct2.twoDecimals() + "%"
+            let pct2 = ctgDiffsPercent[i]
+            if pct2.isNaN  || pct2.isInfinite {
+                outstandingCategoryPercentLabel.text = "(n/a)%"
+            }
+            else {
+                outstandingCategoryPercentLabel.text = pct2.twoDecimals() + "%"
+            }
             
             //"minute" and "hour" are added to their respective "current" variables, then...
             //...if "minute" is greater than or equal to 60, 60 minutes need to be subtracted from "minute" and added as 1 hour to "hour"
@@ -162,30 +180,37 @@ class VCSummary: UIViewController {
                 day += 1
             }
 
-            spendNothingLabel.text = String(format:
-                "If you spend nothing for %.02f days, you will break even on:",
-                daysOverUnder
-            )
+            spendNothingLabel.text = "If you spend nothing for " +
+                daysOverUnder.twoDecimals() + " days, you will break even on:"
         }
         //if a user is under budget, do the opposite of everything above
         else {
             //values need to be negative because "you are under budget by -12.34%" is a double negative statement
-            let pct1 = cumulBudg == 0 ?
-                100.0 : -(cumulSpend / cumulBudg * 100 - 100)
-            overUnderPercentLabel.text = pct1.twoDecimals() + "%"
+            if cumulBudg == 0 {
+                overUnderPercentLabel.text = "(n/a)%"
+            }
+            else {
+                let pct1 = -(cumulSpend / cumulBudg * 100 - 100)
+                overUnderPercentLabel.text = pct1.twoDecimals() + "%"
+            }
+            
             overUnderLabel.text = "UNDER"
             overUnderLabel.textColor = teal
             breakEvenLabel.textColor = teal
 
             //".min" in "ctgDiffsAmount" is used instead of ".max"
-            let index = ctgDiffsAmount.index(of: ctgDiffsAmount.min() ?? 0) ?? 0
+            let i = ctgDiffsAmount.index(of: ctgDiffsAmount.min() ?? 0) ?? 0
             outstandingCategoryLabel.text = "The category most under budget is "
-                + ctgs[index].title + " by:"
+                + ctgs[i].title + " by:"
             outstandingCategoryAmountLabel.text = String(format: "%.02f",
-                ctgDiffsAmount[index]).currencyFormat()
-            let pct2 =
-                ctgDiffsPercent[index].isNaN ? 100.0 : -ctgDiffsPercent[index]
-            outstandingCategoryPercentLabel.text = pct2.twoDecimals() + "%"
+                ctgDiffsAmount[i]).currencyFormat()
+            let pct2 = -ctgDiffsPercent[i]
+            if pct2.isNaN  || pct2.isInfinite {
+                outstandingCategoryPercentLabel.text = "(n/a)%"
+            }
+            else {
+                outstandingCategoryPercentLabel.text = pct2.twoDecimals() + "%"
+            }
             
             //day needs to be made negative because the date component of "breakEvenLabel" is determined using "byAdding" in "Calendar.current.date(...)"; there isn't just a String that is set to equal "day" like there is for "minute" and "hour"
             //"minute" and "hour" are subtracted from their respective "current" variables, then...

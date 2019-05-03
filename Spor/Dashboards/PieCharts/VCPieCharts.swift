@@ -53,13 +53,11 @@ class VCPieCharts: UIViewController, PieChartDelegate {
         var sliceModelsCurrent = [PieSliceModel]()
         var sliceModelsTarget = [PieSliceModel]()
 
-        //because clicking on one pie's slice expands the matching slice in the other pie, slices cannot be excluded from a pie's slice model just because their values are 0 or we would create index-out-of-range exceptions
+        //because clicking on one pie's slice expands the matching slice in the other pie, slices cannot be excluded from a pie's slice model just because their values are 0 or an index-out-of-range exception would be created
         //instead, empty slices are just hidden so that expanding them displays nothing to the user
         //therefore, since empty slices cannot be excluded from each pie's slice model, whether or not a pie is "empty" needs to be decided by determining if ALL slices are empty
-        //"empty" for "currentPie" means that every slice is 0.0, but "targetPie" needs to be evaluated differently because every slice will always add up to 100%, so simply checking for non-zero values doesn't work
-        //this is why "currentPieEmpty" and "targetPieEmpty" are used to filter out empty pies
+        //"empty" for "currentPie" means that every slice is 0.0
         var currentPieEmpty = true
-        var targetPieEmpty = true
         let today = Date().toString().toDate()
         for ctg in ctgs {
             var cumulSpend = 0.0
@@ -73,7 +71,6 @@ class VCPieCharts: UIViewController, PieChartDelegate {
                 description: ctg.title,
                 color: colors[ctgs.firstIndex(of: ctg) ?? 0]
             ))
-            if ctg.budget > 0 { targetPieEmpty = false }
             sliceModelsTarget.append(PieSliceModel(
                 value: ctg.proportion,
                 description: ctg.title,
@@ -81,7 +78,7 @@ class VCPieCharts: UIViewController, PieChartDelegate {
             ))
         }
         if !currentPieEmpty { pies.append(currentPie) }
-        if !targetPieEmpty { pies.append(targetPie) }
+        pies.append(targetPie)
         
         //format and display the pies
         for pie in pies {

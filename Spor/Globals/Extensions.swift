@@ -35,18 +35,24 @@ extension Date {
 }
 
 extension Double {
+    func cap() -> Double {
+        var val = self
+        if val >  999999.99 { val =  999999.99 }
+        if val < -999999.99 { val = -999999.99 }
+        return val
+    }
     func noDecimals() -> String {
         let fmt = NumberFormatter()
         fmt.numberStyle = .decimal
         fmt.maximumFractionDigits = 0
-        return fmt.string(from: self as NSNumber) ?? "0"
+        return fmt.string(from: self.cap() as NSNumber) ?? "0"
     }
     func twoDecimals() -> String {
         let fmt = NumberFormatter()
         fmt.numberStyle = .decimal
         fmt.maximumFractionDigits = 2
         fmt.minimumFractionDigits = 2
-        return fmt.string(from: self as NSNumber) ?? "0"
+        return fmt.string(from: self.cap() as NSNumber) ?? "0"
     }
 }
 
@@ -85,8 +91,8 @@ extension String {
                 withTemplate: ""
             ) as NSString
         
-        return formatter.string(from: min(entry.doubleValue / 100, 999999.99)
-            as NSNumber) ?? ""
+        let val = (entry.doubleValue / 100).cap()
+        return formatter.string(from: val as NSNumber) ?? ""
     }
     func toDate() -> Date {
         let formatter = DateFormatter()

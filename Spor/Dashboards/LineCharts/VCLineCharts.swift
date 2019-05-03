@@ -220,7 +220,7 @@ class VCLineCharts: UIViewController, ChartDelegate {
                 //prevent early outliers (first 31 days) from skewing the range of the y-axis for long-term views (greater than 91 days); this is bound to happen early on when individual transactions have a much greater effect on percentage over/under budget
                 if (scope > 91 && x <= 31 && abs(newY) > 50) { newY = 0 }
             }
-            overUnderLine.append((x: x, y: newY))
+            overUnderLine.append((x: x, y: newY.cap()))
             i += 1
         }
         
@@ -270,8 +270,8 @@ class VCLineCharts: UIViewController, ChartDelegate {
 
         //the y-axis labels are determined by the maximum and minimum y-values in "overUnderLine"
         //"max(...)" and "min(...)" are used to ensure that min is never above zero and max is never below zero, which is necessary for the calculations to carry out properly
-        let yMin = min(0, overUnderLine.min(by: { $0.y < $1.y })?.y ?? 0)
-        let yMax = max(0, overUnderLine.max(by: { $0.y < $1.y })?.y ?? 0)
+        let yMin = min(0, overUnderLine.min(by: { $0.y < $1.y })?.y ?? 0).cap()
+        let yMax = max(0, overUnderLine.max(by: { $0.y < $1.y })?.y ?? 0).cap()
         
         //"dividerDecider" is the y-value in "overUnderLine" furthest away from 0; this value is used to determine what value should be set for "divider"
         let dividerDecider = max(abs(yMin), abs(yMax))
