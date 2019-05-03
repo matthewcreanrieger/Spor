@@ -200,7 +200,7 @@ class VCLogin: UIViewController, UITextFieldDelegate {
         invalidPassword = password.count < 6
         passwordHelperLabel.isHidden = password == "" || !invalidPassword
         retypePasswordHelperLabel.isHidden =
-            retypedPassword == "" || retypedPassword == password
+            retypedPassword == "" || retypedPassword == password || !signUp
         
         sender == passwordField ? (passwordField.backgroundColor = greyDarkest)
             : (retypePasswordField.backgroundColor = greyDarkest)

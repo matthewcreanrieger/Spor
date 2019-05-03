@@ -93,7 +93,7 @@ class VCEditTransactions: UIViewController, UITextFieldDelegate {
     
     //respond to the user editing "changeToField"
     @IBAction func editChangeToField(_ sender: DesignableTextField) {
-        if changeFromField.text == "Amount" {
+        if changeFromField.text == prps[0] {
             sender.text = sender.text?.currencyFormat()
         }
         highlightButtons()
@@ -148,20 +148,20 @@ class VCEditTransactions: UIViewController, UITextFieldDelegate {
             for txn in txns {
                 if txn.selected {
                     switch changeFromField.text {
-                    case "Amount":
+                    case prps[0]:
                         let amt = changeToField.text ?? ""
                         let amtStr = String(amt.suffix(amt.count - 1))
                         let amtVal = Double(amtStr.replacingOccurrences(
                             of: ",", with: "", options: .literal, range: nil))
                         txn.amount = (revenue ? 1 : -1) * (amtVal ?? 0)
                         txn.sign = revenue
-                    case "Category":
+                    case prps[1]:
                         txn.category =
                             changeToField.text ?? ctgs.first?.title ?? ""
-                    case "Date":
+                    case prps[2]:
                         txn.date =
                             (changeToField.text ?? Date().toString()).toDate()
-                    case "Description":
+                    case prps[3]:
                         txn.title = changeToField.text ?? "(no description)"
                     default: break
                     }
@@ -401,19 +401,19 @@ extension VCEditTransactions: UIPickerViewDataSource, UIPickerViewDelegate {
             changeToField.inputView = nil
             
             switch changeFromField.text {
-            case "Amount":
+            case prps[0]:
                 changeToField.keyboardType = UIKeyboardType.numberPad
                 changeToField.keyboardAppearance = UIKeyboardAppearance.dark
                 revenueButton.isHidden = false
                 expenseButton.isHidden = false
-            case "Category":
+            case prps[1]:
                 changeToField.inputView = ctgPkr
                 changeToField.text = ctgs[prevCtg].title
-            case "Date":
+            case prps[2]:
                 createdatePkr()
                 changeToField.inputView = datePkr
                 changeToField.text = Date().toString()
-            case "Description":
+            case prps[3]:
                 changeToField.keyboardType = UIKeyboardType.default
                 changeToField.keyboardAppearance = UIKeyboardAppearance.dark
             default: break

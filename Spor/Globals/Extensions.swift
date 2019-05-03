@@ -34,6 +34,22 @@ extension Date {
     }
 }
 
+extension Double {
+    func noDecimals() -> String {
+        let fmt = NumberFormatter()
+        fmt.numberStyle = .decimal
+        fmt.maximumFractionDigits = 0
+        return fmt.string(from: self as NSNumber) ?? "0"
+    }
+    func twoDecimals() -> String {
+        let fmt = NumberFormatter()
+        fmt.numberStyle = .decimal
+        fmt.maximumFractionDigits = 2
+        fmt.minimumFractionDigits = 2
+        return fmt.string(from: self as NSNumber) ?? "0"
+    }
+}
+
 extension FloatingPoint {
     var degreesToRadians: Self { return self * .pi / 180 }
     var radiansToDegrees: Self { return self * 180 / .pi }

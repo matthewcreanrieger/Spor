@@ -1,7 +1,6 @@
 ////////10////////20////////30////////40////////50////////60////////70////////80
 import UIKit
 import CoreData
-import Firebase
 
 class VCLineCharts: UIViewController, ChartDelegate {
     @IBOutlet weak var budgetLabel: UILabel!
@@ -148,13 +147,14 @@ class VCLineCharts: UIViewController, ChartDelegate {
             of: ",", with: "", options: .literal, range: nil)) ?? 0
         UserDefaults.standard.set(value, forKey: "Budget")
         for ctg in ctgs { ctg.budget = ctg.proportion * value }
+        budgPerDay = value / budgDiv
         fetchCtgs()
         refreshChart()
     }
     
     func refreshChart() {
         //show the activity indicator while the chart loads to prevent confusion for the user
-        //this probably isn't necessary anymore because the caluclations in "refreshChart(...)" are much quicker now than they were during user testing
+        //this probably isn't necessary anymore because the calculations in "refreshChart(...)" are much quicker now than they were during initial testing
         activityIndicator.startAnimating()
         
         //remove all existing labels and series from "lineChart"
@@ -323,15 +323,14 @@ class VCLineCharts: UIViewController, ChartDelegate {
         if title == "LineChartPercent" {
             lineChart.yLabelsFormatter = {
                 (labelIndex: Int, labelValue: Double) -> String in
-                    String(Int(labelValue)) + "%"
+                    labelValue.noDecimals() + "%"
             }
         } else {
             let ccy = UserDefaults.standard.string(forKey: "Currency") ?? "$"
             lineChart.yLabelsFormatter = {
                 (labelIndex: Int, labelValue: Double) -> String in
-                    (labelValue < 0 ? "(" : "")
-                        + ccy + String(Int(abs(labelValue)))
-                        + (labelValue < 0 ? ")" : "")
+                    (labelValue < 0 ? "(" : "") + ccy +
+                    abs(labelValue).noDecimals() + (labelValue < 0 ? ")" : "")
             }
         }
         
@@ -354,22 +353,22 @@ class VCLineCharts: UIViewController, ChartDelegate {
         let value = chart.valueForSeries(1, atIndex: Int(x)-1) ?? 0
         
         //whether or not the value is positive and whether "lineChart" is an amount or percentage chart determines the format of the information presented
-        let underBudget = value < 0
+        let underBudget = value < 0.00001
         let percentChart = (title ?? "").suffix(7) == "Percent"
         
         //"width" is used to determine whether the value of "lineChartValueLabel" should display on the right or left side of the line
         let width = Double(view.frame.width)
         let screenHeight = Double(UIScreen.main.bounds.height)
         lineChartValueLabel = UILabel(frame: CGRect(
-            //if the touch point is in the rightmost 25% of the screen, display the label on the left, otherwise display on the right
-            x: left - width / 2 + ((left < width * 0.75) ? 50.0 : -30.0),
+            //if the touch point is in the rightmost 40% of the screen, display the label on the left, otherwise display on the right
+            x: left - width / 2 + ((left < width * 0.6) ? 50.0 : -30.0),
             //the height of the chart is about half the height of the screen for all displays, so this y-position ensures the label always displays close to the top of the chart area
             y: Double(chart.frame.minY) - screenHeight / 2.0 + 20.0,
             width: width,
             height: screenHeight
         ))
         let lbl = percentChart ?
-            String(format: "%.02f%%", value) :
+            String(value.twoDecimals()) + "%" :
             String(format: "%.02f", value).currencyFormat()
         lineChartValueLabel.text =
             underBudget && !percentChart ? "(" + lbl + ")" : lbl

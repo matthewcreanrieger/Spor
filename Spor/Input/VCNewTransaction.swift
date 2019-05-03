@@ -45,10 +45,10 @@ class VCNewTransaction: UIViewController, UITextFieldDelegate {
         if dbFetched {
             //Categories don't need to be fetched as often as Transactions; only fetch them here if there are none already, which should only happen after the Login workflow or at Launch
             //if it's after a succesful login, this will be skipped in favor of "firebasePull(...)" because "dbFetched" will be false at this point
-            if ctgs.count == 0 { fetchCtgs() }
+            if ctgs.count == 0 { print("fetching"); fetchCtgs() }
             
             //if there are still no Categories after a fetch attempt, create default Categories
-            if ctgs.count == 0 { setDefaultCtgs() }
+            if ctgs.count == 0 { print("fdisaof"); setDefaultCtgs() }
             
             //Transactions are always fetched because they need to be sorted for "transactionsTable"
             //"asc:" is set to false mostly so that the most recent Transactions are at top
@@ -138,7 +138,7 @@ class VCNewTransaction: UIViewController, UITextFieldDelegate {
         super.viewDidAppear(animated)
         //check for missing categories only if the user has already synced with their data store post-login
         let dbFetched = UserDefaults.standard.bool(forKey: "FirebaseFetched")
-        if dbFetched {  checkCtgMissing(self) }
+        if dbFetched { print("checking"); checkCtgMissing(self) }
     }
     
     //close open input views if touch occurs outside of input view or user hits "Return"
@@ -174,7 +174,13 @@ class VCNewTransaction: UIViewController, UITextFieldDelegate {
                                 ctg.proportion = val
                             }
                         case 2: ctg.selected = false
-                        case 3: ctg.sign = true
+                        case 3:
+                            if let val = obj.value as? Bool {
+                                ctg.sign = val
+                                print(i)
+                                print(val)
+                                print(ctg.sign)
+                            }
                         case 4:
                             if let val = obj.value as? String {
                                 ctg.title = val
@@ -183,7 +189,9 @@ class VCNewTransaction: UIViewController, UITextFieldDelegate {
                         }
                         i += 1
                     }
-                    ctgs.append(ctg)
+                    //"sign" originally was used to denote positive or negative (like for Transactions) but has been repurposed to determine whether an existing Category in the user's data store should be stored locally
+                    //because a user is allowed to have Categories with allowances of 0 and because a user could theoretically name their Categories the same as the default Categories storedd in the data store, the only real way to determine if the Category is valid is by setting a special variable, which - in this case - is "sign"
+                    if !ctg.sign { PersistenceService.context.delete(ctg) }
                     let bdg = UserDefaults.standard.double(forKey: "Budget")
                     UserDefaults.standard.set(bdg + ctg.budget,
                                               forKey: "Budget")
@@ -229,7 +237,6 @@ class VCNewTransaction: UIViewController, UITextFieldDelegate {
                             }
                             i += 1
                         }
-                        txns.append(txn)
                     }
                 }
                 

@@ -113,8 +113,8 @@ class VCSummary: UIViewController {
             let cumulCtgBudg = daysSinceStart * ctg.budget / budgDiv
             var cumulCtgSpend = 0.0
             for txn in txns {
-                if txn.date <= now && txn.category == ctg.title {
-                    cumulCtgSpend -= txn.amount
+                if txn.date <= now {
+                    if txn.category == ctg.title {cumulCtgSpend -= txn.amount}
                 }
                 else { break }
             }
@@ -131,8 +131,9 @@ class VCSummary: UIViewController {
 
         //if the user is over budget...
         if cumulSpend > cumulBudg {
-            overUnderPercentLabel.text = String(format:"%.02f%%",
-                cumulBudg == 0 ? 999999.9 : cumulSpend / cumulBudg * 100 - 100)
+            let pct1 = cumulBudg == 0 ?
+                999999.9 : cumulSpend / cumulBudg * 100 - 100
+            overUnderPercentLabel.text = String(pct1.twoDecimals()) + "%"
             overUnderLabel.text = "OVER"
             overUnderLabel.textColor = red
             breakEvenLabel.textColor = red
@@ -143,8 +144,9 @@ class VCSummary: UIViewController {
                 + ctgs[i].title + " by:"
             outstandingCategoryAmountLabel.text = String(format: "%.02f",
                 ctgDiffsAmount[i]).currencyFormat()
-            outstandingCategoryPercentLabel.text = String(format: "%.02f%%",
-                ctgDiffsPercent[i].isNaN ? 999999.99 : ctgDiffsPercent[i])
+            let pct2 = ctgDiffsPercent[i].isNaN ? 999999.99 : ctgDiffsPercent[i]
+            outstandingCategoryPercentLabel.text =
+                String(pct2.twoDecimals()) + "%"
             
             //"minute" and "hour" are added to their respective "current" variables, then...
             //...if "minute" is greater than or equal to 60, 60 minutes need to be subtracted from "minute" and added as 1 hour to "hour"
@@ -168,8 +170,9 @@ class VCSummary: UIViewController {
         //if a user is under budget, do the opposite of everything above
         else {
             //values need to be negative because "you are under budget by -12.34%" is a double negative statement
-            overUnderPercentLabel.text = String(format:"%.02f%%",
-                cumulBudg == 0 ? 100.0 : -(cumulSpend / cumulBudg * 100 - 100))
+            let pct1 = cumulBudg == 0 ?
+                100.0 : -(cumulSpend / cumulBudg * 100 - 100)
+            overUnderPercentLabel.text = String(pct1.twoDecimals()) + "%"
             overUnderLabel.text = "UNDER"
             overUnderLabel.textColor = teal
             breakEvenLabel.textColor = teal
@@ -180,8 +183,10 @@ class VCSummary: UIViewController {
                 + ctgs[index].title + " by:"
             outstandingCategoryAmountLabel.text = String(format: "%.02f",
                 ctgDiffsAmount[index]).currencyFormat()
-            outstandingCategoryPercentLabel.text = String(format: "%.02f%%",
-                ctgDiffsPercent[index].isNaN ? 100.0 : -ctgDiffsPercent[index])
+            let pct2 =
+                ctgDiffsPercent[index].isNaN ? 100.0 : -ctgDiffsPercent[index]
+            outstandingCategoryPercentLabel.text =
+                String(pct2.twoDecimals()) + "%"
             
             //day needs to be made negative because the date component of "breakEvenLabel" is determined using "byAdding" in "Calendar.current.date(...)"; there isn't just a String that is set to equal "day" like there is for "minute" and "hour"
             //"minute" and "hour" are subtracted from their respective "current" variables, then...

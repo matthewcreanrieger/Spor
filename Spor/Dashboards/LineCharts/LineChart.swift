@@ -386,7 +386,7 @@ open class ChartSeries {
     open var line = true
     open var area = false
     open var color = teal { didSet { colors = (above: color, below: color, 0) } }
-    open var colors = (above: red, below: teal, zeroLevel: 0.0)
+    open var colors = (above: red, below: teal, zeroLevel: 0.00001)
     
     public init(_ data: [Double]) {
         self.data = []

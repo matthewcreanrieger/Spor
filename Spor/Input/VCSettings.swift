@@ -6,7 +6,7 @@ import CoreData
 
 class VCSettings: UIViewController, UITextFieldDelegate {
     //Category properties
-    var prps = ["Amount", "Title"]
+    var prps = ["Allowance", "Title"]
     let prpPkr = UIPickerView()
     
     //currencies
@@ -114,7 +114,7 @@ class VCSettings: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func editChangeToField(_ sender: DesignableTextField) {
-        if changeFromField.text == "Amount" {
+        if changeFromField.text == prps[0] {
             sender.text = sender.text?.currencyFormat()
         }
         highlightButtons()
@@ -212,7 +212,7 @@ class VCSettings: UIViewController, UITextFieldDelegate {
             for ctg in ctgs {
                 if ctg.selected {
                     switch changeFromField.text {
-                    case "Amount":
+                    case prps[0]:
                         let amt = changeToField.text ?? ""
                         let amtStr = String(amt.suffix(amt.count - 1))
                         var amtVal = Double(amtStr.replacingOccurrences(of: ",",
@@ -228,7 +228,7 @@ class VCSettings: UIViewController, UITextFieldDelegate {
                         UserDefaults.standard.set(bdg - ctg.budget + amtVal,
                                                   forKey: "Budget")
                         ctg.budget = amtVal
-                    case "Title":
+                    case prps[1]:
                         //prevent duplicate Category names by appending incrementing numbers ("num") to duplicates being added
                         var t = (changeToField.text ?? "New Category")
                                 .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -266,7 +266,7 @@ class VCSettings: UIViewController, UITextFieldDelegate {
             while existingTtl == true {
                 existingTtl = false
                 for ctg in ctgs.reversed() {
-                    if ctg.title == title {
+                    if ctg.title == ttl {
                         num -= 1
                         ttl = "Category #" + String(num)
                         existingTtl = true
@@ -431,6 +431,7 @@ extension VCSettings:
             tableView.deleteRows(at: [indexPath], with: .automatic)
             tableView.endUpdates()
             highlightButtons()
+            firebasePushCtgs()
             checkCtgMissing(self)
         }
     }
@@ -482,7 +483,7 @@ extension VCSettings: UIPickerViewDataSource, UIPickerViewDelegate {
         switch pickerView {
         case prpPkr:
             changeFromField.text = prps[row]
-            if changeFromField.text == "Amount" {
+            if changeFromField.text == prps[0] {
                 changeToField.keyboardType = UIKeyboardType.numberPad }
             else { changeToField.keyboardType = UIKeyboardType.default }
             changeToField.keyboardAppearance = UIKeyboardAppearance.dark

@@ -74,7 +74,7 @@ class VCBreakdown: UIViewController {
             default: break
         }
         
-        let now = Date()
+        let now = Date().toString().toDate()
         let start = UserDefaults.standard.string(forKey: "StartDate")
         let daysSinceStart =
             now.timeIntervalSince((start ?? now.toString()).toDate()) / 86400
@@ -90,8 +90,8 @@ class VCBreakdown: UIViewController {
             let cumulBudg = daysSinceStart * ctgs[i].budget / budgDiv
             var cumulSpend = 0.0
             for txn in txns {
-                if txn.date <= now && txn.category == ctgs[i].title {
-                    cumulSpend -= txn.amount
+                if txn.date <= now {
+                    if txn.category == ctgs[i].title {cumulSpend -= txn.amount}
                 } else { break }
             }
             
@@ -133,7 +133,7 @@ class VCBreakdown: UIViewController {
                 case HeaderD:
                     let value = cumulSpend / cumulBudg * 100 - 100
                     label.text = cumulBudg == 0 ?
-                        "n/a" : String(format:"%.02f%%", value)
+                        "n/a" : String(value.twoDecimals()) + "%"
                     //using "-100.1" as an alternative value in the event of "isNaN" allows for predicatable sorting because -100.0 is the otherwise lowest possible value
                     columnD.append((i, cumulBudg == 0 ? -100.1 : value, label))
                 default: break

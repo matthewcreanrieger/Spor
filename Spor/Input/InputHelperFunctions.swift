@@ -39,16 +39,16 @@ func setDefaults() {
 //creates default Categories; called if no categories exist
 func setDefaultCtgs() {
     let ttls = [
-        "Eating Out",
-        "Entertainment",
-        "Gifts",
-        "Groceries",
-        "Household",
-        "Housekeeping",
-        "Misc.",
-        "Personal Care",
+        "Travel",
         "Transportation",
-        "Travel"
+        "Personal Care",
+        "Misc.",
+        "Housekeeping",
+        "Household",
+        "Groceries",
+        "Gifts",
+        "Entertainment",
+        "Eating Out"
     ]
     var bdgs = [Double]()
     var prts = [Double]()
@@ -74,24 +74,10 @@ func addCtgs(_ bdgs: [Double], _ prts: [Double], _ ttls: [String]) {
         ctgs.insert(ctg, at: 0)
         UserDefaults.standard.set(bdg + ctg.budget, forKey: "Budget")
     }
+    for ctg in ctgs { ctg.selected = false }
     PersistenceService.saveContext()
     refreshSpecialFormatting()
     firebasePushCtgs()
-}
-
-func firebasePushCtgs() {
-    for i in 0..<20 {
-        let ctgID = String(format: "Category%02d", i + 1)
-        let upd : [AnyHashable: Any] = [
-            "Budget":     i < ctgs.count ? ctgs[i].budget     : 0.0,
-            "Proportion": i < ctgs.count ? ctgs[i].proportion : 0.05,
-            "Selected":   i < ctgs.count ? ctgs[i].selected   : false,
-            "Sign":       i < ctgs.count ? ctgs[i].sign       : true,
-            "Title":      i < ctgs.count ? ctgs[i].title      : ctgID
-        ]
-        dbr?.child("Categories")
-            .child(ctgID).updateChildValues(upd)
-    }
 }
 
 //use global references to either...
@@ -144,10 +130,11 @@ func checkCtgMissing(_ vc: UIViewController) {
             title: "Category Missing",
             message: String(ct) + (plr ? " transactions" : " transaction") +
                 " in the Ledger " + (plr ? "are" : "is") + " categorized as " +
-                ctgMiss + ", which has been deleted. Please take one of the " +
-            "following actions to continue:",
+                "\"" + ctgMiss + "\", which has been deleted. Please take " +
+                "one of the following actions to continue:",
             preferredStyle: .alert
         )
+////////////////////////////////////////////////////////////////////////////////
         alert.addAction(UIAlertAction(
             title: "Re-add \"" + ctgMiss + "\" as a Category",
             style: .default,
@@ -233,6 +220,7 @@ func deleteTxns(_ vc: UIViewController) {
 }
 
 //fetch and sort local (CoreData) Categories
+//there are no sort options for the user to choose from; therefore, since Categories never need to be re-sorted, this is called considerably less often than the similar "fetchTxns(...)"
 func fetchCtgs() {
     PersistenceService.saveContext()
     let ctgFR: NSFetchRequest<Category> = Category.fetchRequest()
@@ -248,6 +236,23 @@ func fetchCtgs() {
         PersistenceService.saveContext()
     } catch {}
     firebasePushCtgs()
+}
+
+//whenever Categories are changed, this function is called to update counters in the user's data store and resolve any discrepencies between online and offline Transactions
+//this is called every time Categories are fetched because Categories are only fetched during the same kind of changes, whereas Transactions are fetched more often in order to sort them
+func firebasePushCtgs() {
+    for i in 0..<20 {
+        let ctgID = String(format: "Category%02d", i + 1)
+        let upd : [AnyHashable: Any] = [
+            "Budget":     i < ctgs.count ? ctgs[i].budget     : 0,
+            "Proportion": i < ctgs.count ? ctgs[i].proportion : 0,
+            "Selected":   i < ctgs.count ? ctgs[i].selected   : false,
+            "Sign":       i < ctgs.count ? ctgs[i].sign       : false,
+            "Title":      i < ctgs.count ? ctgs[i].title      : ctgID
+        ]
+        dbr?.child("Categories")
+            .child(ctgID).updateChildValues(upd)
+    }
 }
 
 //fetch and sort local (CoreData) Transactions
@@ -288,7 +293,7 @@ func fetchTxns(sortBy: String, asc: Bool) {
     } catch {}
 }
 
-//whenever Transactions are deleted or added, this function is called to update counters in the user's data store and then call "firebasePush(...)"
+//whenever Transactions are changed, this function is called to update counters in the user's data store and resolve any discrepencies between online and offline Transactions
 func firebasePushTxns() {
     let key = dbr?.child("TransactionCounters")
     let upd: [AnyHashable: Any] = [
