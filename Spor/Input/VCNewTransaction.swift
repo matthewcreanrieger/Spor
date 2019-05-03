@@ -45,10 +45,10 @@ class VCNewTransaction: UIViewController, UITextFieldDelegate {
         if dbFetched {
             //Categories don't need to be fetched as often as Transactions; only fetch them here if there are none already, which should only happen after the Login workflow or at Launch
             //if it's after a succesful login, this will be skipped in favor of "firebasePull(...)" because "dbFetched" will be false at this point
-            if ctgs.count == 0 { print("fetching"); fetchCtgs() }
+            if ctgs.count == 0 { fetchCtgs() }
             
             //if there are still no Categories after a fetch attempt, create default Categories
-            if ctgs.count == 0 { print("fdisaof"); setDefaultCtgs() }
+            if ctgs.count == 0 { setDefaultCtgs() }
             
             //Transactions are always fetched because they need to be sorted for "transactionsTable"
             //"asc:" is set to false mostly so that the most recent Transactions are at top
@@ -138,7 +138,7 @@ class VCNewTransaction: UIViewController, UITextFieldDelegate {
         super.viewDidAppear(animated)
         //check for missing categories only if the user has already synced with their data store post-login
         let dbFetched = UserDefaults.standard.bool(forKey: "FirebaseFetched")
-        if dbFetched { print("checking"); checkCtgMissing(self) }
+        if dbFetched { checkCtgMissing(self) }
     }
     
     //close open input views if touch occurs outside of input view or user hits "Return"
@@ -177,9 +177,6 @@ class VCNewTransaction: UIViewController, UITextFieldDelegate {
                         case 3:
                             if let val = obj.value as? Bool {
                                 ctg.sign = val
-                                print(i)
-                                print(val)
-                                print(ctg.sign)
                             }
                         case 4:
                             if let val = obj.value as? String {
