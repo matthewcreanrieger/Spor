@@ -74,10 +74,11 @@ class VCBreakdown: UIViewController {
             default: break
         }
         
-        let now = Date().toString().toDate()
+        let now = Date()
+        let today = now.toString().toDate()
         let start = UserDefaults.standard.string(forKey: "StartDate")
         let daysSinceStart =
-            now.timeIntervalSince((start ?? now.toString()).toDate()) / 86400
+            now.timeIntervalSince(start?.toDate() ?? today) / 86400
         
         //"labelHeight" is the height of each individual label in "columnA" - "columnD" based on the total amount of vertical space allocated to "columnA" - "columnD"
         //the "0.58" is hard-coded based on constraints that were set in the Storyboard, which should probably be optimized in the future
@@ -90,7 +91,7 @@ class VCBreakdown: UIViewController {
             let cumulBudg = daysSinceStart * ctgs[i].budget / budgDiv
             var cumulSpend = 0.0
             for txn in txns {
-                if txn.date <= now {
+                if txn.date <= today {
                     if txn.category == ctgs[i].title {cumulSpend -= txn.amount}
                 } else { break }
             }
@@ -133,7 +134,7 @@ class VCBreakdown: UIViewController {
                 case HeaderD:
                     let value = cumulSpend / cumulBudg * 100 - 100
                     label.text = cumulBudg == 0 ?
-                        "n/a" : String(value.twoDecimals()) + "%"
+                        "n/a" : value.twoDecimals() + "%"
                     //using "-100.1" as an alternative value in the event of "isNaN" allows for predicatable sorting because -100.0 is the otherwise lowest possible value
                     columnD.append((i, cumulBudg == 0 ? -100.1 : value, label))
                 default: break

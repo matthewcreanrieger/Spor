@@ -188,13 +188,14 @@ class VCNewTransaction: UIViewController, UITextFieldDelegate {
                     }
                     //"sign" originally was used to denote positive or negative (like for Transactions) but has been repurposed to determine whether an existing Category in the user's data store should be stored locally
                     //because a user is allowed to have Categories with allowances of 0 and because a user could theoretically name their Categories the same as the default Categories storedd in the data store, the only real way to determine if the Category is valid is by setting a special variable, which - in this case - is "sign"
-                    if !ctg.sign { PersistenceService.context.delete(ctg) }
-                    let bdg = UserDefaults.standard.double(forKey: "Budget")
-                    UserDefaults.standard.set(bdg + ctg.budget,
-                                              forKey: "Budget")
+                    if ctg.sign {
+                        let bdg = UserDefaults.standard.double(forKey: "Budget")
+                        UserDefaults.standard.set(bdg + ctg.budget,
+                                                  forKey: "Budget")
+                    } else { PersistenceService.context.delete(ctg) }
                 }
             }
-            
+
             //once all Categories have finished being pulled, start pulling Transactions
             let key = dbr?.child("Transactions")
             key?.observeSingleEvent(of: .value, with: { snap in

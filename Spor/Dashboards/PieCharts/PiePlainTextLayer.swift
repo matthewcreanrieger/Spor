@@ -38,7 +38,7 @@ open class PiePlainTextLayer: PieChartLayer {
             label.font = UIFont.boldSystemFont(ofSize: 11)
             return label
         }()
-        let text = slice.data.model.value == 0 ? "" : String(format: "  %.02f%% ", slice.data.percentage * 100)
+        let text = slice.data.model.value == 0 ? "" : String(format: "  %.0f%% ", slice.data.percentage * 100)
         let size = (text as NSString).size(withAttributes: [ .font: settings.label.font])
         let center = settings.viewRadius.map{slice.view.midPoint(radius: $0)} ?? slice.view.arcCenter
         let availableSize = CGSize(width: slice.view.maxRectWidth(center: center, height: size.height), height: size.height)

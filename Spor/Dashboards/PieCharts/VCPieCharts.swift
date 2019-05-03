@@ -60,10 +60,11 @@ class VCPieCharts: UIViewController, PieChartDelegate {
         //this is why "currentPieEmpty" and "targetPieEmpty" are used to filter out empty pies
         var currentPieEmpty = true
         var targetPieEmpty = true
+        let today = Date().toString().toDate()
         for ctg in ctgs {
             var cumulSpend = 0.0
             for txn in txns {
-                if txn.date > Date() { break }
+                if txn.date > today { break }
                 else if txn.category == ctg.title { cumulSpend -= txn.amount }
             }
             if cumulSpend > 0 { currentPieEmpty = false }

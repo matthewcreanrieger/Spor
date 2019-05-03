@@ -18,6 +18,7 @@ class VCLineCharts: UIViewController, ChartDelegate {
         UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
     var budgDiv = 1.0
     var budgPerDay = 1.0
+    var scope = 1
     var swipeL = UISwipeGestureRecognizer(target: self, action: nil)
     var swipeR = UISwipeGestureRecognizer(target: self, action: nil)
     var swipeU = UISwipeGestureRecognizer(target: self, action: nil)
@@ -163,25 +164,26 @@ class VCLineCharts: UIViewController, ChartDelegate {
 
         //calculate "scope", "day1", and the number of days between "StartDate" and "day1" ("pre1"), which will all be used to calculate the data points in "lineChart"
         //if the selected scope exceeds the time since "StartDate", set "scope" to "daysSinceStart", rounded up
-        let now = Date()
-        let start = UserDefaults.standard.string(forKey: "StartDate") ??
-            now.toString()
-        let daysSinceStart = now.timeIntervalSince(start.toDate()) / 86400
-        var scope = 31
+        let today = Date().toString().toDate()
+        let start =
+            UserDefaults.standard.string(forKey: "StartDate")?.toDate() ?? today
+        let daysSinceStart = today.timeIntervalSince(start) / 86400
+        let daysSinceStartRounded = Int(floor(daysSinceStart)) + 1
         switch UserDefaults.standard.string(forKey: "ChartPeriod") {
             case "W":  scope = 7
             case "2W": scope = 14
             case "M":  scope = 31
             case "Q":  scope = 91
             case "Y":  scope = 365
-            case "∞":  scope = Int(ceil(daysSinceStart))
-            default:   break
+            case "∞":  scope = daysSinceStartRounded
+            default:   scope = 31
         }
 
-        let day1 = max(start.toDate(), Calendar.current.date(byAdding: .day,
-            value: -scope + 1, to: now.toString().toDate()) ?? now)
-        let pre1 = Int(ceil(day1.timeIntervalSince(start.toDate()) / 86400.0))
-        if pre1 == 0 { scope = Int(ceil(daysSinceStart)) }
+        let day1 = max(start, Calendar.current.date(byAdding: .day,
+                                                    value: -scope + 1,
+                                                    to: today) ?? today)
+        if day1 == start { scope = daysSinceStartRounded }
+        let pre1 = Int(ceil(day1.timeIntervalSince(start) / 86400.0))
         
         //create array of ChartSeries (lines) to be added to "lineChart"
         var series = [ChartSeries]()
@@ -197,45 +199,46 @@ class VCLineCharts: UIViewController, ChartDelegate {
         var yValue = 0.0
         var t = 0
         for txn in txns {
-            if txn.date <= day1 {
+            if txn.date < day1 {
                 yValue -= txn.amount
                 t += 1
             }
             else { break }
         }
-
+        
         //for each day in scope, add "i" and a cumulative calculation of "yValue" to "overUnderLine"
         var i = 1
-        while i <= scope {
+        
+        func addDataPoint(_ x: Int, _ y: Double) {
+            let cumulBudg = budgPerDay * Double(pre1 + x - 1)
+            var newY = y - cumulBudg
+            if title == "LineChartPercent" {
+                //calculate "newY" as a percentage
+                if cumulBudg == 0 { newY = 0 }
+                else { newY = yValue / cumulBudg * 100 - 100 }
+                
+                //prevent early outliers (first 31 days) from skewing the range of the y-axis for long-term views (greater than 91 days); this is bound to happen early on when individual transactions have a much greater effect on percentage over/under budget
+                if (scope > 91 && x <= 31 && abs(newY) > 50) { newY = 0 }
+            }
+            overUnderLine.append((x: x, y: newY))
+            i += 1
+        }
+        
+        //start off with a data point for what has already occurred before "day1"
+        addDataPoint(i, yValue)
+        
+        while i <= scope + 1 {
             //if "t" is valid and the date of the transaction associated with "t" ("txn") matches the date associated with "i" ("match"), add the amount of that transaction to the cumulative "yValue" and increment "t"
             let txn = txns.count > t ? txns[t].date.toString() : nil
             let match = (Calendar.current.date(byAdding: .day, value: -scope
-                + i, to: now.toString().toDate()) ?? now).toString()
+                + i - 1, to: today) ?? today).toString()
             if txn == match {
                 yValue -= txns[t].amount
                 t += 1
             }
             //otherwise, supply "overUnderLine" with i for "x:" and a y value calculated based on "yValue" appropriate for the specific chart (percent vs. amount over budget)
             //then, increment i
-            else {
-                var newY = yValue - budgPerDay * Double(pre1 + i)
-                if title == "LineChartPercent" {
-                    //format yValue as percentage
-                    newY = yValue / (budgPerDay * Double(pre1 + i)) * 100 - 100
-                    //prevent early outliers (first 31 days) from skewing the range of the y-axis for long-term views (greater than 91 days); this is bound to happen early on when individual transactions have a much greater effect on percentage over/under budget
-                    if (newY.isNaN ||
-                        newY.isInfinite ||
-                        (scope > 91 && i <= 31 && abs(newY) > 50))
-                    {
-                        newY = 0
-                    }
-                }
-                overUnderLine.append((x: i, y: newY))
-                i += 1
-                
-                //add an extra data point to show a flat line for today
-                if i > scope { overUnderLine.append((x: i, y: newY)) }
-            }
+            else { addDataPoint(i, yValue) }
         }
 
         series.append(ChartSeries(data: zeroLine))
@@ -258,11 +261,11 @@ class VCLineCharts: UIViewController, ChartDelegate {
         lineChart.xLabelsFormatter = {
             (labelIndex: Int, labelValue: Double) -> String in
                 let formatter = DateFormatter()
-                formatter.dateFormat = scope < 11 ? "EEEEE" : "M/d"
+                formatter.dateFormat = self.scope < 11 ? "EEEEE" : "M/d"
                 return formatter.string(from: Calendar.current.date(
                     byAdding: .day,
-                    value: -scope + Int(labelValue),
-                    to: now.toString().toDate()) ?? now)
+                    value: -self.scope + Int(labelValue),
+                    to: today) ?? today)
         }
 
         //the y-axis labels are determined by the maximum and minimum y-values in "overUnderLine"
@@ -350,7 +353,7 @@ class VCLineCharts: UIViewController, ChartDelegate {
         lineChartValueLabel.removeFromSuperview()
         
         //the value of series 1 ("overUnderLine") at the point nearest to where the user touched ("x") is what is displayed next to the line
-        let value = chart.valueForSeries(1, atIndex: Int(x)-1) ?? 0
+        let value = chart.valueForSeries(1, atIndex: Int(round(x)) - 1) ?? 0
         
         //whether or not the value is positive and whether "lineChart" is an amount or percentage chart determines the format of the information presented
         let underBudget = value < 0.00001
@@ -368,7 +371,7 @@ class VCLineCharts: UIViewController, ChartDelegate {
             height: screenHeight
         ))
         let lbl = percentChart ?
-            String(value.twoDecimals()) + "%" :
+            value.twoDecimals() + "%" :
             String(format: "%.02f", value).currencyFormat()
         lineChartValueLabel.text =
             underBudget && !percentChart ? "(" + lbl + ")" : lbl

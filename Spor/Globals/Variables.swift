@@ -35,27 +35,27 @@ let greyDarkest  = UIColor(named: "GreyDarkest")  ?? .black
 //used by "VCPieCharts.swift" and "VCBreakdown.swift"
 //a list of 20 color-blindness-friendly colors used to distinguish a user's categories
 //CREDIT: Sasha Trubetskoy (https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/)
-//SIMILARITY TO ORIGINAL CONTENT: very slightly modified
+//SIMILARITY TO ORIGINAL CONTENT: mostly just reorganized
 let colors = [
-    UIColor(red: 0.26, green: 0.39, blue: 0.85, alpha: 1.0),
-    UIColor(red: 0.96, green: 0.51, blue: 0.19, alpha: 1.0),
-    UIColor(red: 0.57, green: 0.12, blue: 0.71, alpha: 1.0),
-    UIColor(red: 0.27, green: 0.94, blue: 0.94, alpha: 1.0),
-    UIColor(red: 0.94, green: 0.20, blue: 0.90, alpha: 1.0),
-    UIColor(red: 0.24, green: 0.71, blue: 0.29, alpha: 1.0),
-    UIColor(red: 1.00, green: 0.88, blue: 0.10, alpha: 1.0),
+    teal,
+    red,
     UIColor(red: 0.00, green: 0.50, blue: 0.50, alpha: 1.0),
     UIColor(red: 0.90, green: 0.75, blue: 1.00, alpha: 1.0),
-    UIColor(red: 1.00, green: 0.98, blue: 0.78, alpha: 1.0),
     UIColor(red: 0.50, green: 0.00, blue: 0.00, alpha: 1.0),
+    UIColor(red: 0.26, green: 0.39, blue: 0.85, alpha: 1.0),
+    UIColor(red: 1.00, green: 0.88, blue: 0.10, alpha: 1.0),
+    UIColor(red: 0.57, green: 0.12, blue: 0.71, alpha: 1.0),
+    UIColor(red: 0.24, green: 0.71, blue: 0.29, alpha: 1.0),
+    UIColor(red: 0.96, green: 0.51, blue: 0.19, alpha: 1.0),
     UIColor(red: 0.67, green: 1.00, blue: 0.78, alpha: 1.0),
-    UIColor(red: 0.50, green: 0.50, blue: 0.00, alpha: 1.0),
-    UIColor(red: 0.00, green: 0.00, blue: 0.46, alpha: 1.0),
     UIColor(red: 0.90, green: 0.10, blue: 0.29, alpha: 1.0),
-    UIColor(red: 0.74, green: 0.96, blue: 0.05, alpha: 1.0),
-    UIColor(red: 0.98, green: 0.75, blue: 0.75, alpha: 1.0),
-    UIColor(red: 1.00, green: 0.85, blue: 0.69, alpha: 1.0),
     UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 1.0),
-    UIColor(red: 0.60, green: 0.39, blue: 0.14, alpha: 1.0)
+    UIColor(red: 0.74, green: 0.96, blue: 0.05, alpha: 1.0),
+    UIColor(red: 1.00, green: 0.85, blue: 0.69, alpha: 1.0),
+    UIColor(red: 0.00, green: 0.00, blue: 0.46, alpha: 1.0),
+    UIColor(red: 0.60, green: 0.39, blue: 0.14, alpha: 1.0),
+    UIColor(red: 0.94, green: 0.20, blue: 0.90, alpha: 1.0),
+    UIColor(red: 1.00, green: 0.98, blue: 0.78, alpha: 1.0),
+    UIColor(red: 0.50, green: 0.50, blue: 0.00, alpha: 1.0)
 ]
 ////////10////////20////////30////////40////////50////////60////////70////////80
